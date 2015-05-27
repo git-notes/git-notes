@@ -1,16 +1,16 @@
 {
-  "name": "eightoheight",
-  "productName": "EightOhEight",
+  "name": "xmail",
+  "productName": "Xmail",
   "version": "0.0.1",
-  "description": "A Sample Electron App",
+  "description": "A Mail Client App",
   "main": "./src/browser/main.js",
-  "author": "The Electron Community",
+  "author": "liuxiong",
   "repository": {
     "type": "git",
-    "url": "https://github.com/atom/electron-starter.git"
+    "url": "https://github.com/liuxiong332/xmail"
   },
   "bugs": {
-    "url": "https://github.com/atom/electron-starter/issues"
+    "url": "https://github.com/liuxiong332/xmail/issues"
   },
   "licenses": [
     {
