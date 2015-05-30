@@ -48,6 +48,7 @@ function copyFileSync(srcFile, destFile) {
 }
 
 function bootstrap() {
+  process.env.ATOM_NODE_VERSION = '0.24.0'
   var apmInstallPath = path.resolve(__dirname, '..', 'apm');
   if (!fs.existsSync(apmInstallPath))
     fs.mkdirSync(apmInstallPath);
