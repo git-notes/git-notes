@@ -1,4 +1,6 @@
 remote = require 'remote'
+{CompositeDisposable, Emitter} = require 'event-kit'
+
 StorageFolder = require './storage-folder'
 
 class Xmail
@@ -32,3 +34,11 @@ class Xmail
   # Deserializes the Atom environment from a state object
   @deserialize: (state) ->
     new this(state) if state?.version is @version
+
+  constructor: (@state) ->
+    @emitter = new Emitter
+    @disposables = new CompositeDisposable
+    {@mode} = @state
+    DeserializerManager = require './deserializer-manager'
+    @deserializers = new DeserializerManager()
+    @deserializeTimings = {}
