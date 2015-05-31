@@ -217,3 +217,5 @@ module.exports = (grunt) ->
 
   defaultTasks = ['build-atom-shell', 'bower:install', 'build', 'set-version', 'generate-asar']
   grunt.registerTask('default', defaultTasks)
+
+  grunt.registerTask('build-asar', ['build', 'set-version', 'generate-asar'])
