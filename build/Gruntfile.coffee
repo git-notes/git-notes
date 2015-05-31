@@ -41,7 +41,7 @@ module.exports = (grunt) ->
   executableName = if process.platform is 'win32' then "#{productName}.exe" else productName
   executableName = executableName.toLowerCase() if process.platform is 'linux'
 
-  buildDir = grunt.option('build-dir') ? path.join(tmpDir, "#{pkgName}-build")
+  buildDir = grunt.option('build-dir') ? path.resolve('dist/')
   buildDir = path.resolve(buildDir)
   installDir = grunt.option('install-dir')
 
