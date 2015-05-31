@@ -6,7 +6,7 @@ window.onload = function() {
     var startTime = Date.now();
 
     // Skip "?loadSettings=".
-    var loadSettings = JSON.parse(decodeURIComponent(location.search.substr(14)));
+    var loadSettings = JSON.parse(decodeURIComponent(location.hash.substr(1)));
 
     // Require before the module cache in dev mode
     if (loadSettings.devMode) {

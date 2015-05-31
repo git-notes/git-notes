@@ -49,7 +49,7 @@ class AppWindow
       protocol: 'file'
       pathname: targetPath
       slashes: true
-      query: {loadSettings: JSON.stringify(@loadSettings)}
+      hash: encodeURIComponent JSON.stringify(@loadSettings)
 
     @window.loadUrl targetUrl
     @window.show()
