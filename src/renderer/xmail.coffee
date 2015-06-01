@@ -74,6 +74,76 @@ class Xmail
     @installErrorHandler()
 
 
+  ###
+  Section: Event Subscription
+  ###
+
+  # Extended: Invoke the given callback whenever {::beep} is called.
+  #
+  # * `callback` {Function} to be called whenever {::beep} is called.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidBeep: (callback) ->
+    @emitter.on 'did-beep', callback
+
+  # Extended: Invoke the given callback when there is an unhandled error, but
+  # before the devtools pop open
+  #
+  # * `callback` {Function} to be called whenever there is an unhandled error
+  #   * `event` {Object}
+  #     * `originalError` {Object} the original error object
+  #     * `message` {String} the original error object
+  #     * `url` {String} Url to the file where the error originated.
+  #     * `line` {Number}
+  #     * `column` {Number}
+  #     * `preventDefault` {Function} call this to avoid popping up the dev tools.
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onWillThrowError: (callback) ->
+    @emitter.on 'will-throw-error', callback
+
+  # Extended: Invoke the given callback whenever there is an unhandled error.
+  #
+  # * `callback` {Function} to be called whenever there is an unhandled error
+  #   * `event` {Object}
+  #     * `originalError` {Object} the original error object
+  #     * `message` {String} the original error object
+  #     * `url` {String} Url to the file where the error originated.
+  #     * `line` {Number}
+  #     * `column` {Number}
+  #
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  onDidThrowError: (callback) ->
+    @emitter.on 'did-throw-error', callback
+
+  ###
+  Section: Xmail Details
+  ###
+
+  # Public: Is the current window in development mode?
+  inDevMode: ->
+    @devMode ?= @getLoadSettings().devMode
+
+  # Public: Is the current window in safe mode?
+  inSafeMode: ->
+    @safeMode ?= @getLoadSettings().safeMode
+
+  # Public: Is the current window running specs?
+  inSpecMode: ->
+    @specMode ?= @getLoadSettings().isSpec
+
+  # Public: Get the version of the Atom application.
+  #
+  # Returns the version text {String}.
+  getVersion: ->
+    @appVersion ?= @getLoadSettings().appVersion
+
+  # Public: Get the directory path to Atom's configuration area.
+  #
+  # Returns the absolute path to `~/.atom`.
+  getConfigDirPath: ->
+    @constructor.getConfigDirPath()
+    
   # Get the dimensions of this window.
   #
   # Returns an {Object} with the following keys:
