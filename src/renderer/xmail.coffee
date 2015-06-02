@@ -143,7 +143,106 @@ class Xmail
   # Returns the absolute path to `~/.atom`.
   getConfigDirPath: ->
     @constructor.getConfigDirPath()
-    
+
+  # Public: Get the load settings for the current window.
+  #
+  # Returns an {Object} containing all the load setting key/value pairs.
+  getLoadSettings: ->
+    @constructor.getLoadSettings()
+
+  ###
+  Section: Managing The Atom Window
+  ###
+
+  # Essential: Get the size of current window.
+  #
+  # Returns an {Object} in the format `{width: 1000, height: 700}`
+  getSize: ->
+    [width, height] = @getCurrentWindow().getSize()
+    {width, height}
+
+  # Essential: Set the size of current window.
+  #
+  # * `width` The {Number} of pixels.
+  # * `height` The {Number} of pixels.
+  setSize: (width, height) ->
+    @getCurrentWindow().setSize(width, height)
+
+  # Essential: Get the position of current window.
+  #
+  # Returns an {Object} in the format `{x: 10, y: 20}`
+  getPosition: ->
+    [x, y] = @getCurrentWindow().getPosition()
+    {x, y}
+
+  # Essential: Set the position of current window.
+  #
+  # * `x` The {Number} of pixels.
+  # * `y` The {Number} of pixels.
+  setPosition: (x, y) ->
+    ipc.send('call-window-method', 'setPosition', x, y)
+
+  # Extended: Get the current window
+  getCurrentWindow: ->
+    @constructor.getCurrentWindow()
+
+  # Extended: Move current window to the center of the screen.
+  center: ->
+    ipc.send('call-window-method', 'center')
+
+  # Extended: Focus the current window.
+  focus: ->
+    ipc.send('call-window-method', 'focus')
+    $(window).focus()
+
+  # Extended: Show the current window.
+  show: ->
+    ipc.send('call-window-method', 'show')
+
+  # Extended: Hide the current window.
+  hide: ->
+    ipc.send('call-window-method', 'hide')
+
+  # Extended: Reload the current window.
+  reload: ->
+    ipc.send('call-window-method', 'restart')
+
+  # Extended: Returns a {Boolean} true when the current window is maximized.
+  isMaximixed: ->
+    @getCurrentWindow().isMaximized()
+
+  maximize: ->
+    ipc.send('call-window-method', 'maximize')
+
+  # Extended: Is the current window in full screen mode?
+  isFullScreen: ->
+    @getCurrentWindow().isFullScreen()
+
+  # Extended: Set the full screen state of the current window.
+  setFullScreen: (fullScreen=false) ->
+    ipc.send('call-window-method', 'setFullScreen', fullScreen)
+    if fullScreen
+      document.body.classList.add("fullscreen")
+    else
+      document.body.classList.remove("fullscreen")
+
+  # Extended: Toggle the full screen state of the current window.
+  toggleFullScreen: ->
+    @setFullScreen(not @isFullScreen())
+
+  # Restore the window to its previous dimensions and show it.
+  #
+  # Also restores the full screen and maximized state on the next tick to
+  # prevent resize glitches.
+  displayWindow: ->
+    dimensions = @restoreWindowDimensions()
+    @show()
+
+    setImmediate =>
+      @focus()
+      @setFullScreen(true) if @workspace?.fullScreen
+      @maximize() if dimensions?.maximized and process.platform isnt 'darwin'
+
   # Get the dimensions of this window.
   #
   # Returns an {Object} with the following keys:
@@ -222,44 +321,3 @@ class Xmail
     workspaceElement = @views.getView(@workspace)
     backgroundColor = window.getComputedStyle(workspaceElement)['background-color']
     window.localStorage.setItem('atom:window-background-color', backgroundColor)
-
-  # Essential: Get the size of current window.
-  #
-  # Returns an {Object} in the format `{width: 1000, height: 700}`
-  getSize: ->
-    [width, height] = @getCurrentWindow().getSize()
-    {width, height}
-
-  # Essential: Set the size of current window.
-  #
-  # * `width` The {Number} of pixels.
-  # * `height` The {Number} of pixels.
-  setSize: (width, height) ->
-    @getCurrentWindow().setSize(width, height)
-
-  # Essential: Get the position of current window.
-  #
-  # Returns an {Object} in the format `{x: 10, y: 20}`
-  getPosition: ->
-    [x, y] = @getCurrentWindow().getPosition()
-    {x, y}
-
-  # Essential: Set the position of current window.
-  #
-  # * `x` The {Number} of pixels.
-  # * `y` The {Number} of pixels.
-  setPosition: (x, y) ->
-    ipc.send('call-window-method', 'setPosition', x, y)
-
-  # Extended: Get the current window
-  getCurrentWindow: ->
-    @constructor.getCurrentWindow()
-
-  # Extended: Move current window to the center of the screen.
-  center: ->
-    ipc.send('call-window-method', 'center')
-
-  # Extended: Focus the current window.
-  focus: ->
-    ipc.send('call-window-method', 'focus')
-    $(window).focus()
