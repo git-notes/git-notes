@@ -14,25 +14,21 @@ runSpecSuite = (logFile) ->
     jasmineFn = require 'jasmine'
     jasmineFn(global.jasmine)
 
-    logFile = global.loadSettings.logFile ? path.resolve(__dirname, 'log.txt')
+    outDir = path.resolve(__dirname, 'out')
+    fs.mkdirSync(outDir) unless fs.existsSync(outDir)
+    logFile = global.loadSettings.logFile ? path.resolve(outDir, 'log.txt')
     logStream = fs.openSync(logFile, 'w') if logFile?
-    log = (str) ->
-      if logStream?
-        fs.writeSync(logStream, str)
-      else
-        process.stderr.write(str)
-    {TerminalReporter} = require 'jasmine-tagged'
+    log = (str) -> fs.writeSync(logStream, str)
 
-    reporter = new TerminalReporter
+    reporter = new jasmine.ConsoleReporter
       print: (str) ->
         log(str)
-      onComplete: (runner) ->
+      onComplete: (allPassed) ->
         fs.closeSync(logStream) if logStream?
-        if runner.results().failedCount > 0 then atom.exit(1) else atom.exit(0)
+        app.exit(if allPassed then 0 else 1)
 
     jasmineEnv = jasmine.getEnv()
     jasmineEnv.addReporter(reporter)
-    # jasmineEnv.setIncludedTags([process.platform])
 
     for specFilePath in fs.listTreeSync(specRootPath) when /-spec\.(coffee|js)$/.test specFilePath
       require specFilePath

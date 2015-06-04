@@ -12,3 +12,4 @@ debug.log
 /atom-shell/
 /static/components/
 dist/
+spec/out/
