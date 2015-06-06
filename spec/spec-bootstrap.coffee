@@ -20,6 +20,7 @@ runSpecSuite = (logFile) ->
     logStream = fs.openSync(logFile, 'w') if logFile?
     log = (str) -> fs.writeSync(logStream, str)
 
+    ConsoleReporter = require './reporter/console-reporter'
     reporter = new jasmine.ConsoleReporter
       print: (str) ->
         log(str)
