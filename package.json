@@ -53,6 +53,7 @@
     "clean": "node script/clean"
   },
   "devDependencies": {
-    "jasmine": "^2.3.1"
+    "jasmine": "^2.3.1",
+    "jasmine-md-reporter": "^0.1.0"
   }
 }

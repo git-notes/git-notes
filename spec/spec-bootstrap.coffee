@@ -16,12 +16,14 @@ runSpecSuite = (logFile) ->
 
     outDir = path.resolve(__dirname, 'out')
     fs.mkdirSync(outDir) unless fs.existsSync(outDir)
-    logFile = global.loadSettings.logFile ? path.resolve(outDir, 'log.txt')
+    logFile = global.loadSettings.logFile ? path.resolve(outDir, 'log.md')
     logStream = fs.openSync(logFile, 'w') if logFile?
     log = (str) -> fs.writeSync(logStream, str)
 
-    ConsoleReporter = require './reporter/console-reporter'
-    reporter = new jasmine.ConsoleReporter
+    MdReporter = require 'jasmine-md-reporter'
+    reporter = new MdReporter
+      basePath: path.resolve(__dirname, '..')
+      ignoreStackPatterns: 'node_modules/jasmine/**'
       print: (str) ->
         log(str)
       onComplete: (allPassed) ->
