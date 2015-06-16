@@ -1,6 +1,6 @@
 Q = require 'q'
 _ = require 'underscore-plus'
-{Emitter, CompositeDisposable} = require 'event-kit'
+{Emitter} = require 'event-kit'
 
 module.exports =
 class AccountManager
@@ -8,7 +8,6 @@ class AccountManager
 
   constructor: ->
     @accounts = null
-    @subscriptions = new CompositeDisposable
     @emitter = new Emitter
 
   @registerAccount: (Account) ->

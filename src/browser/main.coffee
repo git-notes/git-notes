@@ -91,7 +91,7 @@ start = ->
     else
       Application = require './application'
 
-    global.application = new Application(args)
+    global.application = Application.open(args)
     console.log("App load time: #{Date.now() - global.shellStartTime}ms") unless args.test
 
 start()

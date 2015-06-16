@@ -15,20 +15,60 @@ _ = require 'underscore-plus'
 AppMenu = require './appmenu'
 AppWindow = require './appwindow'
 
+DefaultSocketPath =
+  if process.platform is 'win32'
+    '\\\\.\\pipe\\xmail-sock'
+  else
+    path.join(os.tmpdir(), "xmail-#{process.env.USER}.sock")
+
 module.exports =
 class Application
   _.extend @prototype, EventEmitter.prototype
 
+  @open: (options) ->
+    options.socketPath ?= DefaultSocketPath
+
+    createApplication = -> new Application(options)
+
+    client = net.connect options.socketPath, ->
+      client.write JSON.stringify(options), ->
+        console.log 'App has started!'
+        client.end()
+        app.terminate()
+
+    client.on 'error', createApplication
+
   constructor: (options) ->
-    {@resourcePath, @devMode } = options
+    {@resourcePath, @devMode, @socketPath} = options
 
     @pkgJson = require '../../package.json'
     @windows = []
+
+    @listenForArgumentsFromNewProcess()
 
     app.on 'window-all-closed', ->
       app.quit() if process.platform in ['win32', 'linux']
 
     @openWithOptions(options)
+
+  listenForArgumentsFromNewProcess: ->
+    @deleteSocketFile()
+    server = net.createServer (connection) ->
+
+    server.listen @socketPath
+    server.on 'error', (error) -> console.error 'Application server failed', error
+
+  deleteSocketFile: ->
+    return if process.platform is 'win32'
+
+    if fs.existsSync(@socketPath)
+      try
+        fs.unlinkSync(@socketPath)
+      catch error
+        # Ignore ENOENT errors in case the file was deleted between the exists
+        # check and the call to unlink sync. This occurred occasionally on CI
+        # which is why this check is here.
+        throw error unless error.code is 'ENOENT'
 
   # Opens a new window based on the options provided.
   #

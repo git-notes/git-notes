@@ -1,7 +1,7 @@
 remote = require 'remote'
 {CompositeDisposable, Emitter} = require 'event-kit'
 {convertStackTrace, convertLine} = require 'coffeestack'
-
+AccountManager = require './account-manager'
 StorageFolder = require './storage-folder'
 
 class Xmail
@@ -38,11 +38,13 @@ class Xmail
 
   constructor: (@state) ->
     @emitter = new Emitter
-    @disposables = new CompositeDisposable
-    {@mode} = @state
-    DeserializerManager = require './deserializer-manager'
-    @deserializers = new DeserializerManager()
-    @deserializeTimings = {}
+    @accountManager = new AccountManager
+    # @disposables = new CompositeDisposable
+    # {@mode} = @state
+    # DeserializerManager = require './deserializer-manager'
+    # @deserializers = new DeserializerManager()
+    # @deserializeTimings = {}
+
 
   installErrorHandler: ->
     sourceMapCache = {}
