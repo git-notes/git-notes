@@ -141,6 +141,8 @@ class Xmail
   getVersion: ->
     @appVersion ?= @getLoadSettings().appVersion
 
+  getAccountManager: -> @accountManager
+  
   # Public: Get the directory path to Atom's configuration area.
   #
   # Returns the absolute path to `~/.atom`.
