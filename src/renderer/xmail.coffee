@@ -4,6 +4,7 @@ remote = require 'remote'
 AccountManager = require './account-manager'
 StorageFolder = require './storage-folder'
 
+module.exports =
 class Xmail
   @version = 1
 
