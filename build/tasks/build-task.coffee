@@ -20,7 +20,7 @@ module.exports = (grunt) ->
 
     switch process.platform
       when 'darwin'
-        cp "electron/#{appName}", shellAppDir, filter: /default_app/
+        cp "electron/Electron.app", shellAppDir, filter: /default_app/
       when 'linux', 'win32'
         cp 'electron', shellAppDir, filter: /default_app/
 

@@ -17,7 +17,7 @@ if (theArgs.length < 1) {
 var cmd = path.join(target, pkgInfo.productName, 'electron');
 
 if (process.platform === 'darwin') {
-  cmd = path.join(target, pkgInfo.productName + '.app', 'Contents', 'MacOS', pkgInfo.productName);
+  cmd = path.join(target, pkgInfo.productName + '.app', 'Contents', 'MacOS', 'Electron');
 }
 
 if (process.platform === 'win32') {
