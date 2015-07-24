@@ -6,7 +6,7 @@ require('./utils/config')
 
 var pkgInfo = require(path.resolve(__dirname, '..', 'package.json'));
 
-var target = path.join(process.env.TMPDIR || process.env.TEMP || '/tmp', pkgInfo.name + "-build");
+var target = path.resolve(__dirname, '..', 'dist/');
 
 var theArgs = process.argv.slice(2);
 if (theArgs.length < 1) {
@@ -14,14 +14,14 @@ if (theArgs.length < 1) {
 }
 
 // Linux
-var cmd = path.join(target, pkgInfo.productName, pkgInfo.name);
+var cmd = path.join(target, pkgInfo.productName, 'electron');
 
 if (process.platform === 'darwin') {
   cmd = path.join(target, pkgInfo.productName + '.app', 'Contents', 'MacOS', pkgInfo.productName);
 }
 
 if (process.platform === 'win32') {
-  cmd = path.join(target, pkgInfo.productName, pkgInfo.productName + '.exe');
+  cmd = path.join(target, pkgInfo.productName, 'electron.exe');
 }
 
 var toRun = cmd + " " + theArgs.join(" ");

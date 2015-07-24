@@ -47,8 +47,16 @@ function copyFileSync(srcFile, destFile) {
   return fs.closeSync(fdw);
 }
 
+function getHomeDirectory() {
+  return process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
+}
+
+var name = require('../package.json').name;
+
 function bootstrap() {
-  process.env.ATOM_NODE_VERSION = '0.24.0'
+  process.env.ATOM_NODE_VERSION = '0.30.0'
+  process.env.ATOM_HOME = path.join(getHomeDirectory(), '.' + name)
+
   var apmInstallPath = path.resolve(__dirname, '..', 'apm');
   if (!fs.existsSync(apmInstallPath))
     fs.mkdirSync(apmInstallPath);

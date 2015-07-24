@@ -12,7 +12,6 @@ _ = require 'underscore-plus'
 packageJson = require '../package.json'
 
 module.exports = (grunt) ->
-  grunt.loadNpmTasks('grunt-bower-task')
   grunt.loadNpmTasks('grunt-coffeelint')
   grunt.loadNpmTasks('grunt-lesslint')
   grunt.loadNpmTasks('grunt-cson')
@@ -20,7 +19,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-contrib-less')
   grunt.loadNpmTasks('grunt-shell')
-  grunt.loadNpmTasks('grunt-build-atom-shell')
+  grunt.loadNpmTasks('grunt-download-electron')
   grunt.loadNpmTasks('grunt-atom-shell-installer')
   grunt.loadNpmTasks('grunt-peg')
   grunt.loadTasks('tasks')
@@ -41,7 +40,7 @@ module.exports = (grunt) ->
   executableName = if process.platform is 'win32' then "#{productName}.exe" else productName
   executableName = executableName.toLowerCase() if process.platform is 'linux'
 
-  buildDir = grunt.option('build-dir') ? path.resolve('dist/')
+  buildDir = grunt.option('build-dir') ? path.resolve(__dirname, '..', 'dist/')
   buildDir = path.resolve(buildDir)
   installDir = grunt.option('install-dir')
 
@@ -161,14 +160,9 @@ module.exports = (grunt) ->
         'static/**/*.less'
       ]
 
-    'build-atom-shell':
-      tag: "v0.24.0"
-      nodeVersion: '0.24.0'
-      remoteUrl: "https://github.com/atom/atom-shell"
-      buildDir: buildDir
-      rebuildPackages: true
-      projectName: pkgName
-      productName: productName
+    'download-electron':
+      version: '0.30.0',
+      outputDir: 'electron'
 
     'create-windows-installer':
       appDirectory: shellAppDir
@@ -184,11 +178,6 @@ module.exports = (grunt) ->
     mkrpm:
       categories: 'GNOME;GTK;Development;Documentation'
       genericName: 'Demo Application'
-
-    bower:
-      install:
-        options:
-          targetDir: 'static/components'
 
     shell:
       'kill-app':
@@ -206,7 +195,7 @@ module.exports = (grunt) ->
   grunt.registerTask('lint', ['coffeelint', 'csslint', 'lesslint'])
   grunt.registerTask('test', ['shell:kill-app', 'run-specs'])
 
-  ciTasks = ['output-disk-space', 'build-atom-shell', 'bower:install', 'build', 'generate-license']
+  ciTasks = ['output-disk-space', 'download-electron', 'build', 'generate-license']
   ciTasks.push('dump-symbols') if process.platform isnt 'win32'
   ciTasks.push('set-version', 'check-licenses', 'lint', 'generate-asar')
   ciTasks.push('mkdeb') if process.platform is 'linux'
@@ -215,7 +204,5 @@ module.exports = (grunt) ->
   ciTasks.push('codesign')
   grunt.registerTask('ci', ciTasks)
 
-  defaultTasks = ['build-atom-shell', 'bower:install', 'build', 'set-version', 'generate-asar']
+  defaultTasks = ['download-electron', 'build', 'set-version', 'generate-asar']
   grunt.registerTask('default', defaultTasks)
-
-  grunt.registerTask('build-asar', ['build', 'set-version', 'generate-asar'])

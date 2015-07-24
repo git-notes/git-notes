@@ -20,9 +20,9 @@ module.exports = (grunt) ->
 
     switch process.platform
       when 'darwin'
-        cp "atom-shell/#{appName}", shellAppDir, filter: /default_app/
+        cp "electron/#{appName}", shellAppDir, filter: /default_app/
       when 'linux', 'win32'
-        cp 'atom-shell', shellAppDir, filter: /default_app/
+        cp 'electron', shellAppDir, filter: /default_app/
 
     cp 'package.json', path.join(appDir, 'package.json')
 
