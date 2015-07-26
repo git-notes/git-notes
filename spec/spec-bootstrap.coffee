@@ -9,11 +9,22 @@ app = remote.require 'app'
 require('crash-reporter').start(productName: @pkgJson.name, companyName: 'atom-shell-starter')
 specRootPath = path.resolve(global.loadSettings.resourcePath, 'spec/')
 
-runSpecSuite = (logFile) ->
-  if global.loadSettings.exitWhenDone
-    jasmineFn = require 'jasmine'
-    jasmineFn(global.jasmine)
+jasmineReport: ->
+  link = document.createElement 'link'
+  link.rel = 'stylesheet'
+  link.href = '../vendor/jasmine/lib/jasmine-2.1.3/jasmine.css'
+  document.head.appendChild link
 
+  window.jasmineRequire = require '../vendor/jasmine/lib/jasmine-2.1.3/jasmine'
+  require '../vendor/jasmine/lib/jasmine-2.1.3/jasmine-html'
+  require '../vendor/jasmine/lib/jasmine-2.1.3/boot'
+
+  window.jasmineExecute()
+
+runSpecSuite = (logFile) ->
+  jasmineFn = require 'jasmine'
+  jasmineFn(global.jasmine)
+  if false #global.loadSettings.exitWhenDone
     outDir = path.resolve(__dirname, 'out')
     fs.mkdirSync(outDir) unless fs.existsSync(outDir)
     logFile = global.loadSettings.logFile ? path.resolve(outDir, 'log.md')
@@ -37,18 +48,14 @@ runSpecSuite = (logFile) ->
       require specFilePath
     jasmineEnv.execute()
   else
-    link = document.createElement 'link'
-    link.rel = 'stylesheet'
-    link.href = '../vendor/jasmine/lib/jasmine-2.1.3/jasmine.css'
-    document.head.appendChild link
+    XmailReporter = require './xmail-reporter'
+    reporter = new XmailReporter
 
-    window.jasmineRequire = require '../vendor/jasmine/lib/jasmine-2.1.3/jasmine'
-    require '../vendor/jasmine/lib/jasmine-2.1.3/jasmine-html'
-    require '../vendor/jasmine/lib/jasmine-2.1.3/boot'
-
+    console.log jasmine
+    jasmineEnv = jasmine.getEnv()
+    jasmineEnv.addReporter(reporter)
     for specFilePath in fs.listTreeSync(specRootPath) when /-spec\.(coffee|js)$/.test specFilePath
       require specFilePath
-
-    window.jasmineExecute()
+    jasmineEnv.execute()
 
 runSpecSuite()

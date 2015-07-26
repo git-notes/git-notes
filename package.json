@@ -40,6 +40,7 @@
     "season": "^1.0.2",
     "semver": "2.2.1",
     "serializable": "^1",
+    "space-view": "^0.1.0",
     "space-pen": "^5.1.1",
     "temp": "0.7.0",
     "underscore-plus": "^1.6.1",
