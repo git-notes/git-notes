@@ -1,5 +1,6 @@
 fs = require 'fs-plus'
 path = require 'path'
+_ = require 'underscore-plus'
 
 module.exports = (grunt) ->
   cp: (source, destination, {filter}={}) ->
