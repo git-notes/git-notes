@@ -1,6 +1,6 @@
-# Electron Build
+# Atom Build
 
-This folder contains the grunt configuration and tasks to build Electron apps.
+This folder contains the grunt configuration and tasks to build Atom.
 
 It was moved from the root of the repository so that any native modules used
 would be compiled against node's v8 headers since anything stored in

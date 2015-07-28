@@ -11,16 +11,20 @@ class Xmail
   @loadOrCreate: (mode) ->
     xmail = @deserialize(@loadState(mode)) ? new this({mode, @version})
 
+  # Deserializes the Atom environment from a state object
+  @deserialize: (state) ->
+    new this(state) if state?.version is @version
+
   # Loads and returns the serialized state corresponding to this window
   # if it exists; otherwise returns undefined.
   @loadState: (mode) ->
     @getStorageFolder().load(mode)
 
-  # Get the directory path to Atom's configuration area.
+  # Get the directory path to Xmail's configuration area.
   #
-  # Returns the absolute path to ~/.atom
+  # Returns the absolute path to ~/.xmail
   @getConfigDirPath: ->
-    @configDirPath ?= process.env.ATOM_HOME
+    @configDirPath ?= process.env.XMAIL_HOME
 
   @getStorageFolder: ->
     @storageFolder ?= new StorageFolder(@getConfigDirPath())
@@ -29,6 +33,11 @@ class Xmail
   @getLoadSettings: ->
     @loadSettings ?= JSON.parse(decodeURIComponent(location.hash.substr(1)))
     @loadSettings
+
+  @updateLoadSetting: (key, value) ->
+    @getLoadSettings()
+    @loadSettings[key] = value
+    location.hash = encodeURIComponent(JSON.stringify(@loadSettings))
 
   @getCurrentWindow: ->
     remote.getCurrentWindow()
@@ -40,12 +49,11 @@ class Xmail
   constructor: (@state) ->
     @emitter = new Emitter
     @accountManager = new AccountManager
-    # @disposables = new CompositeDisposable
-    # {@mode} = @state
-    # DeserializerManager = require './deserializer-manager'
-    # @deserializers = new DeserializerManager()
+    @disposables = new CompositeDisposable
+    {@mode} = @state
+    DeserializerManager = require './deserializer-manager'
+    @deserializers = new DeserializerManager()
     # @deserializeTimings = {}
-
 
   installErrorHandler: ->
     sourceMapCache = {}
@@ -75,7 +83,12 @@ class Xmail
 
   initialize: ->
     @installErrorHandler()
+    @displayWindow() unless @inSpecMode()
 
+    @setBodyPlatformClass()
+
+  setBodyPlatformClass: ->
+    document.body.classList.add("platform-#{process.platform}")
 
   ###
   Section: Event Subscription
@@ -141,8 +154,12 @@ class Xmail
   getVersion: ->
     @appVersion ?= @getLoadSettings().appVersion
 
+  # Public: Determine whether the current version is an official release.
+  isReleasedVersion: ->
+    not /\w{7}/.test(@getVersion()) # Check if the release is a 7-character SHA prefix
+
   getAccountManager: -> @accountManager
-  
+
   # Public: Get the directory path to Atom's configuration area.
   #
   # Returns the absolute path to `~/.atom`.
@@ -158,6 +175,10 @@ class Xmail
   ###
   Section: Managing The Atom Window
   ###
+
+  # Essential: Close the current window.
+  close: ->
+    @getCurrentWindow().close()
 
   # Essential: Get the size of current window.
   #
@@ -242,9 +263,9 @@ class Xmail
   displayWindow: ->
     dimensions = @restoreWindowDimensions()
     @show()
+    @focus()
 
     setImmediate =>
-      @focus()
       @setFullScreen(true) if @workspace?.fullScreen
       @maximize() if dimensions?.maximized and process.platform isnt 'darwin'
 
@@ -323,6 +344,6 @@ class Xmail
   storeWindowBackground: ->
     return if @inSpecMode()
 
-    workspaceElement = @views.getView(@workspace)
-    backgroundColor = window.getComputedStyle(workspaceElement)['background-color']
-    window.localStorage.setItem('atom:window-background-color', backgroundColor)
+    # workspaceElement = @views.getView(@workspace)
+    # backgroundColor = window.getComputedStyle(workspaceElement)['background-color']
+    # window.localStorage.setItem('atom:window-background-color', backgroundColor)

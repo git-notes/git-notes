@@ -9,7 +9,8 @@ node_modules
 npm-debug.log
 debug.log
 /tags
-/electron/
-/static/components/
+/atom-shell/
+docs/output
+docs/includes
+spec/fixtures/evil-files/
 dist/
-spec/out/

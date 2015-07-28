@@ -13,12 +13,11 @@ CONTROL_FILE="$3"
 DESKTOP_FILE="$4"
 ICON_FILE="$5"
 DEB_PATH="$6"
-SHORT_NAME="$7"
 FILE_MODE=755
 
 TARGET_ROOT="`mktemp -d`"
 chmod $FILE_MODE "$TARGET_ROOT"
-TARGET="$TARGET_ROOT/$SHORT_NAME-$VERSION-$ARCH"
+TARGET="$TARGET_ROOT/atom-$VERSION-$ARCH"
 
 mkdir -m $FILE_MODE -p "$TARGET/usr"
 env INSTALL_PREFIX="$TARGET/usr" script/grunt install
@@ -33,19 +32,16 @@ mkdir -m $FILE_MODE -p "$TARGET/usr/share/pixmaps"
 cp "$ICON_FILE" "$TARGET/usr/share/pixmaps"
 
 # Copy generated LICENSE.md to /usr/share/doc/atom/copyright
-mkdir -m $FILE_MODE -p "$TARGET/usr/share/doc/$SHORT_NAME"
-cp "$TARGET/usr/share/$SHORT_NAME/LICENSE.md" "$TARGET/usr/share/doc/$SHORT_NAME/copyright"
+mkdir -m $FILE_MODE -p "$TARGET/usr/share/doc/atom"
+cp "$TARGET/usr/share/atom/resources/LICENSE.md" "$TARGET/usr/share/doc/atom/copyright"
 
 # Add lintian overrides
 mkdir -m $FILE_MODE -p "$TARGET/usr/share/lintian/overrides"
-cp "$ROOT/resources/linux/debian/lintian-overrides" "$TARGET/usr/share/lintian/overrides/$SHORT_NAME"
-
-# Symlink bin
-ln -s "/usr/share/$SHORT_NAME/$SHORT_NAME" "$TARGET/usr/bin/$SHORT_NAME"
+cp "$ROOT/resources/linux/debian/lintian-overrides" "$TARGET/usr/share/lintian/overrides/atom"
 
 # Remove executable bit from .node files
 find "$TARGET" -type f -name "*.node" -exec chmod a-x {} \;
 
 fakeroot dpkg-deb -b "$TARGET"
-mv "$TARGET_ROOT/$SHORT_NAME-$VERSION-$ARCH.deb" "$DEB_PATH"
+mv "$TARGET_ROOT/atom-$VERSION-$ARCH.deb" "$DEB_PATH"
 rm -rf "$TARGET_ROOT"

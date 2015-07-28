@@ -18,7 +18,7 @@ module.exports = (grunt) ->
 
   unlockKeychain = (callback) ->
     cmd = 'security'
-    { XCODE_KEYCHAIN_PASSWORD, XCODE_KEYCHAIN } = process.env
+    {XCODE_KEYCHAIN_PASSWORD, XCODE_KEYCHAIN} = process.env
     args = ['unlock-keychain', '-p', XCODE_KEYCHAIN_PASSWORD, XCODE_KEYCHAIN]
     spawn {cmd, args}, (error) -> callback(error)
 
@@ -32,5 +32,19 @@ module.exports = (grunt) ->
         cmd = 'codesign'
         args = ['--deep', '--force', '--verbose', '--sign', XCODE_SIGNING_IDENTITY, shellAppDir]
         spawn {cmd, args}, (error) -> callback(error)
+      when 'win32'
+        spawn {cmd: 'taskkill', args: ['/F', '/IM', 'atom.exe']}, ->
+          cmd = process.env.JANKY_SIGNTOOL ? 'signtool'
+          args = [path.join(grunt.config.get('atom.shellAppDir'), 'atom.exe')]
+
+          spawn {cmd, args}, (error) ->
+            return callback(error) if error?
+
+            setupExePath = path.resolve(grunt.config.get('atom.buildDir'), 'installer', 'AtomSetup.exe')
+            if fs.isFileSync(setupExePath)
+              args = [setupExePath]
+              spawn {cmd, args}, (error) -> callback(error)
+            else
+              callback()
       else
         callback()

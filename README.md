@@ -1,38 +1,81 @@
-# Xmail client
+![Atom](https://cloud.githubusercontent.com/assets/72919/2874231/3af1db48-d3dd-11e3-98dc-6066f8bc766f.png)
 
-xmail is the email client app. It's built on **electron**.
+[![Build Status](https://travis-ci.org/atom/atom.svg?branch=master)](https://travis-ci.org/atom/atom)
+[![Dependency Status](https://david-dm.org/atom/atom.svg)](https://david-dm.org/atom/atom)
+[![Join the Atom Community on Slack](http://atom-slack.herokuapp.com/badge.svg)](http://atom-slack.herokuapp.com/)
 
-# Electron Starter App
+Atom is a hackable text editor for the 21st century, built on [Electron](https://github.com/atom/electron), and based on everything we love about our favorite editors. We designed it to be deeply customizable, but still approachable using the default configuration.
 
-electron-starter is a base application that you can use to get started writing your own cross-platform (Win/Mac/Linux) Desktop apps via Electron. This template is extracted from the Atom source code, cleaned up to be more generic, and to be a great starting point for a production app.
+Visit [atom.io](https://atom.io) to learn more or visit the [Atom forum](https://discuss.atom.io).
 
-### Getting Started
+Follow [@AtomEditor](https://twitter.com/atomeditor) on Twitter for important
+announcements.
 
-Everything in Electron Starter is configured via the `package.json` file - there are some extra fields that are of interest:
+This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are expected to uphold this code.
+[code-of-conduct]: http://todogroup.org/opencodeofconduct/#Atom/opensource@github.com
 
-* `name` - The name for your app that will be used in the build tools. Make it something simple.
-* `productName` - The name of your product - your executable will be called this (i.e. "MyApp.app")
+## Documentation
 
-The default project is called EightOhEight (get it? Cause it's a sample(r)).
+If you want to read about using Atom or developing packages in Atom, the [Atom Flight Manual](https://atom.io/docs/latest/) is free and available online, along with ePub, PDF and mobi versions. You can find the source to the manual in [atom/docs](https://github.com/atom/docs).
 
-Once you've set that up, do:
+The [API reference](https://atom.io/docs/api) for developing packages is also documented on Atom.io.
 
-1. `script/bootstrap` - Run this once per checkout.
-2. `script/build` - Run this whenever you change package.json or change early startup code
-3. `script/run` - Run the app. Use this for running the app in developer mode
+## Installing
 
-Another useful script is `script/grunt`, which will run the local version of Grunt. `script/grunt --help` will tell you the list of available tasks.
+### OS X
 
-### Using JavaScript ES6
+Download the latest [Atom release](https://github.com/atom/atom/releases/latest).
 
-JavaScript ES6 / ESNext is available via the Babel project for almost all files except for very early in startup. To use it, add `'use babel';` to the top of your file. Check out https://babeljs.io for more information. 
+Atom will automatically update when a new release is available.
 
-### What's the "browser" vs "renderer" code?
+### Windows
 
-Electron has (at least) two separate contexts - when your app first starts up, it is running in a DOM-less node.js loop - there are no windows. This is called the *Browser* context. The built-in code proceeds to start up a `BrowserWindow` object, which then creates a *Rendering* context, which is what you are more used to - it's got the Chrome DevTools and a DOM, yet it can *still* use node.js, as well as several Electron APIs that are made available. Check out the [documentation for Electron](https://github.com/atom/atom-shell/tree/master/docs/api) for more about what you can do.
+Download the latest [AtomSetup.exe installer](https://github.com/atom/atom/releases/latest).
 
-Most of your app's code should ideally live in the *Rendering* context, because the Browser context is difficult to debug and test - there is no Chrome DevTools, solely printf-based debugging.
+Atom will automatically update when a new release is available.
 
-### Why does `$MY_FAVORITE_LIBRARY` not work / do weird stuff?
+You can also download an `atom-windows.zip` file from the [releases page](https://github.com/atom/atom/releases/latest).
+The `.zip` version will not automatically update.
 
-Some JavaScript libraries try to detect whether they're in node.js via probing for `module` or `require`, and assume that they aren't in a browser. You might find that you need to patch these libraries to always operate in Browser Mode.
+Using [chocolatey](https://chocolatey.org/)? Run `cinst Atom` to install
+the latest version of Atom.
+
+### Debian Linux (Ubuntu)
+
+Currently only a 64-bit version is available.
+
+1. Download `atom-amd64.deb` from the [Atom releases page](https://github.com/atom/atom/releases/latest).
+2. Run `sudo dpkg --install atom-amd64.deb` on the downloaded package.
+3. Launch Atom using the installed `atom` command.
+
+The Linux version does not currently automatically update so you will need to
+repeat these steps to upgrade to future releases.
+
+### Red Hat Linux (Fedora 21 and under, CentOS, Red Hat)
+
+Currently only a 64-bit version is available.
+
+1. Download `atom.x86_64.rpm` from the [Atom releases page](https://github.com/atom/atom/releases/latest).
+2. Run `sudo yum localinstall atom.x86_64.rpm` on the downloaded package.
+3. Launch Atom using the installed `atom` command.
+
+The Linux version does not currently automatically update so you will need to
+repeat these steps to upgrade to future releases.
+
+### Fedora 22+
+
+Currently only a 64-bit version is available.
+
+1. Download `atom.x86_64.rpm` from the [Atom releases page](https://github.com/atom/atom/releases/latest).
+2. Run `sudo dnf install atom.x86_64.rpm` on the downloaded package.
+3. Launch Atom using the installed `atom` command.
+
+The Linux version does not currently automatically update so you will need to
+repeat these steps to upgrade to future releases.
+
+## Building
+
+* [Linux](docs/build-instructions/linux.md)
+* [OS X](docs/build-instructions/os-x.md)
+* [FreeBSD](docs/build-instructions/freebsd.md)
+* [Windows](docs/build-instructions/windows.md)

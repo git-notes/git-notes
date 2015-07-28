@@ -1,61 +1,30 @@
-fs = require 'fs-plus'
-path = require 'path'
-remote = require 'remote'
-app = remote.require 'app'
-
-@pkgJson = require 'package.json'
-
 # Start the crash reporter before anything else.
-require('crash-reporter').start(productName: @pkgJson.name, companyName: 'atom-shell-starter')
-specRootPath = path.resolve(global.loadSettings.resourcePath, 'spec/')
+require('crash-reporter').start(productName: 'Atom', companyName: 'GitHub')
 
-jasmineReport: ->
-  link = document.createElement 'link'
-  link.rel = 'stylesheet'
-  link.href = '../vendor/jasmine/lib/jasmine-2.1.3/jasmine.css'
-  document.head.appendChild link
+path = require 'path'
 
-  window.jasmineRequire = require '../vendor/jasmine/lib/jasmine-2.1.3/jasmine'
-  require '../vendor/jasmine/lib/jasmine-2.1.3/jasmine-html'
-  require '../vendor/jasmine/lib/jasmine-2.1.3/boot'
+try
+  require '../src/window'
+  Atom = require '../src/atom'
+  window.atom = Atom.loadOrCreate('spec')
 
-  window.jasmineExecute()
+  # Show window synchronously so a focusout doesn't fire on input elements
+  # that are focused in the very first spec run.
+  atom.getCurrentWindow().show() unless atom.getLoadSettings().exitWhenDone
 
-runSpecSuite = (logFile) ->
-  jasmineFn = require 'jasmine'
-  jasmineFn(global.jasmine)
-  if false #global.loadSettings.exitWhenDone
-    outDir = path.resolve(__dirname, 'out')
-    fs.mkdirSync(outDir) unless fs.existsSync(outDir)
-    logFile = global.loadSettings.logFile ? path.resolve(outDir, 'log.md')
-    logStream = fs.openSync(logFile, 'w') if logFile?
-    log = (str) -> fs.writeSync(logStream, str)
+  {runSpecSuite} = require './jasmine-helper'
 
-    MdReporter = require 'jasmine-md-reporter'
-    reporter = new MdReporter
-      basePath: path.resolve(__dirname, '..')
-      ignoreStackPatterns: 'node_modules/jasmine/**'
-      print: (str) ->
-        log(str)
-      onComplete: (allPassed) ->
-        fs.closeSync(logStream) if logStream?
-        app.exit(if allPassed then 0 else 1)
+  # Add 'exports' to module search path.
+  exportsPath = path.join(atom.getLoadSettings().resourcePath, 'exports')
+  require('module').globalPaths.push(exportsPath)
+  # Still set NODE_PATH since tasks may need it.
+  process.env.NODE_PATH = exportsPath
 
-    jasmineEnv = jasmine.getEnv()
-    jasmineEnv.addReporter(reporter)
-
-    for specFilePath in fs.listTreeSync(specRootPath) when /-spec\.(coffee|js)$/.test specFilePath
-      require specFilePath
-    jasmineEnv.execute()
+  document.title = "Spec Suite"
+  runSpecSuite './spec-suite', atom.getLoadSettings().logFile
+catch error
+  if atom?.getLoadSettings().exitWhenDone
+    console.error(error.stack ? error)
+    atom.exit(1)
   else
-    XmailReporter = require './xmail-reporter'
-    reporter = new XmailReporter
-
-    console.log jasmine
-    jasmineEnv = jasmine.getEnv()
-    jasmineEnv.addReporter(reporter)
-    for specFilePath in fs.listTreeSync(specRootPath) when /-spec\.(coffee|js)$/.test specFilePath
-      require specFilePath
-    jasmineEnv.execute()
-
-runSpecSuite()
+    throw error

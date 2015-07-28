@@ -1,9 +1,8 @@
 fs = require 'fs'
 path = require 'path'
 os = require 'os'
-_ = require 'underscore-plus'
 
-# Add support for obsolete APIs of vm module so we can make some third-party
+# Add support for obselete APIs of vm module so we can make some third-party
 # modules work under node v0.11.x.
 require 'vm-compatibility-layer'
 
@@ -44,11 +43,11 @@ module.exports = (grunt) ->
   buildDir = path.resolve(buildDir)
   installDir = grunt.option('install-dir')
 
-  home = process.env.HOME ? process.env.USERPROFILE
+  home = if process.platform is 'win32' then process.env.USERPROFILE else process.env.HOME
+  atomShellDownloadDir = path.join(home, ".#{pkgName}", 'atom-shell')
 
   symbolsDir = path.join(buildDir, "#{productName}.breakpad.syms")
   shellAppDir = path.join(buildDir, appName)
-
   if process.platform is 'win32'
     contentsDir = shellAppDir
     appDir = path.join(shellAppDir, 'resources', 'app')
@@ -72,6 +71,9 @@ module.exports = (grunt) ->
       expand: true
       src: [
         'src/**/*.coffee'
+        'spec/*.coffee'
+        '!spec/*-spec.coffee'
+        'exports/**/*.coffee'
         'static/**/*.coffee'
       ]
       dest: appDir
@@ -80,6 +82,7 @@ module.exports = (grunt) ->
   lessConfig =
     options:
       paths: [
+        'static/variables'
         'static'
       ]
     glob_to_multiple:
@@ -89,6 +92,12 @@ module.exports = (grunt) ->
       ]
       dest: appDir
       ext: '.css'
+
+  prebuildLessConfig =
+    src: [
+      'static/**/*.less'
+      'node_modules/atom-space-pen-views/stylesheets/**/*.less'
+    ]
 
   csonConfig =
     options:
@@ -105,21 +114,57 @@ module.exports = (grunt) ->
       dest: appDir
       ext: '.json'
 
+  pegConfig =
+    glob_to_multiple:
+      expand: true
+      src: ['src/**/*.pegjs']
+      dest: appDir
+      ext: '.js'
+
+  # for child in fs.readdirSync('node_modules') when child isnt '.bin'
+  #   directory = path.join('node_modules', child)
+  #   metadataPath = path.join(directory, 'package.json')
+  #   continue unless grunt.file.isFile(metadataPath)
+  #
+  #   {engines, theme} = grunt.file.readJSON(metadataPath)
+  #   if engines?.atom?
+  #     coffeeConfig.glob_to_multiple.src.push("#{directory}/**/*.coffee")
+  #     coffeeConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.coffee")
+  #
+  #     lessConfig.glob_to_multiple.src.push("#{directory}/**/*.less")
+  #     lessConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.less")
+  #
+  #     unless theme
+  #       prebuildLessConfig.src.push("#{directory}/**/*.less")
+  #       prebuildLessConfig.src.push("!#{directory}/spec/**/*.less")
+  #
+  #     csonConfig.glob_to_multiple.src.push("#{directory}/**/*.cson")
+  #     csonConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.cson")
+  #
+  #     pegConfig.glob_to_multiple.src.push("#{directory}/lib/*.pegjs")
+
   opts =
     name: pkgName
-
     pkg: grunt.file.readJSON('package.json')
+
+    docsOutputDir: 'docs/output'
 
     coffee: coffeeConfig
 
     less: lessConfig
 
+    'prebuild-less': prebuildLessConfig
+
     cson: csonConfig
+
+    peg: pegConfig
 
     coffeelint:
       options:
         configFile: 'coffeelint.json'
       src: [
+        'dot-atom/**/*.coffee'
+        'exports/**/*.coffee'
         'src/**/*.coffee'
       ]
       build: [
@@ -161,14 +206,20 @@ module.exports = (grunt) ->
       ]
 
     'download-electron':
-      version: '0.30.0',
-      outputDir: 'electron'
+      version: packageJson.atomShellVersion
+      outputDir: 'atom-shell'
+      downloadDir: atomShellDownloadDir
+      rebuild: true  # rebuild native modules after atom-shell is updated
+      token: process.env.ATOM_ACCESS_TOKEN
 
     'create-windows-installer':
       appDirectory: shellAppDir
       outputDirectory: path.join(buildDir, 'installer')
       authors: packageJson.author
-      iconUrl: packageJson.iconUrl ? 'https://raw.githubusercontent.com/atom/atom/master/resources/atom.png'
+      loadingGif: path.resolve(__dirname, '..', 'resources', 'win', 'loading.gif')
+      iconUrl: packageJson.iconUrl ? 'https://raw.githubusercontent.com/atom/atom/master/resources/win/atom.ico'
+      setupIcon: path.resolve(__dirname, '..', 'resources', 'win', 'atom.ico')
+      remoteReleases: 'https://atom.io/api/updates'
 
     mkdeb:
       section: 'misc'
@@ -191,18 +242,20 @@ module.exports = (grunt) ->
 
   grunt.initConfig(opts)
 
-  grunt.registerTask('compile', ['coffee', 'cson'])
+  grunt.registerTask('compile', ['coffee', 'prebuild-less', 'cson', 'peg'])
   grunt.registerTask('lint', ['coffeelint', 'csslint', 'lesslint'])
-  grunt.registerTask('test', ['shell:kill-app', 'run-specs'])
+  grunt.registerTask('test', ['shell:kill-atom', 'run-specs'])
 
-  ciTasks = ['output-disk-space', 'download-electron', 'build', 'generate-license']
+  ciTasks = ['output-disk-space', 'download-electron', 'download-atom-shell-chromedriver', 'build']
   ciTasks.push('dump-symbols') if process.platform isnt 'win32'
   ciTasks.push('set-version', 'check-licenses', 'lint', 'generate-asar')
   ciTasks.push('mkdeb') if process.platform is 'linux'
   ciTasks.push('create-windows-installer') if process.platform is 'win32'
   ciTasks.push('test') if process.platform is 'darwin'
-  ciTasks.push('codesign')
+  ciTasks.push('codesign') unless process.env.TRAVIS
+  ciTasks.push('publish-build') unless process.env.TRAVIS
   grunt.registerTask('ci', ciTasks)
 
-  defaultTasks = ['download-electron', 'build', 'set-version', 'generate-asar']
+  defaultTasks = ['download-electron', 'download-atom-shell-chromedriver', 'build', 'set-version', 'generate-asar']
+  defaultTasks.push 'install' unless process.platform is 'linux'
   grunt.registerTask('default', defaultTasks)
