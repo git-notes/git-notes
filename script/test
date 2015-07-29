@@ -2,6 +2,7 @@
 var safeExec = require('./utils/child-process-wrapper.js').safeExec;
 var runGrunt = require('./utils/run-grunt.js');
 var path = require('path');
+require('./utils/config')
 
 process.chdir(path.dirname(__dirname));
 

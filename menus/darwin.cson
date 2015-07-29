@@ -1,8 +1,8 @@
 'menu': [
   {
-    label: 'Atom'
+    label: '<%= productName %>'
     submenu: [
-      { label: 'About Atom', command: 'application:about' }
+      { label: 'About <%= productName %>', command: 'application:about' }
       { label: 'View License', command: 'application:open-license' }
       { label: 'VERSION', enabled: false }
       { label: 'Restart and Install Update', command: 'application:install-update', visible: false}
