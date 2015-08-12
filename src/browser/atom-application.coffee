@@ -19,9 +19,9 @@ _ = require 'underscore-plus'
 
 DefaultSocketPath =
   if process.platform is 'win32'
-    '\\\\.\\pipe\\atom-sock'
+    '\\\\.\\pipe\\xmail-sock'
   else
-    path.join(os.tmpdir(), "atom-#{process.env.USER}.sock")
+    path.join(os.tmpdir(), "xmail-#{process.env.USER}.sock")
 
 # The application's singleton class.
 #
