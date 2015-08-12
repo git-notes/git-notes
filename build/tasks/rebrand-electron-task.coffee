@@ -30,12 +30,12 @@ module.exports = (grunt) ->
         newName = path.resolve(shellAppDir, appName)
         fs.renameSync oldName, newName
       when 'darwin'
-        contentsDir = grunt.config.get("#{pkgName}.contentsDir")
+        contentsPath = grunt.config.get("#{pkgName}.contentsDir")
         defaultBundleName = 'com.electron.' + pkgName
 
         frameworksPath = path.join(contentsPath, 'Frameworks')
         helperPlistFilename = path.join(frameworksPath, 'Electron Helper.app', 'Contents', 'Info.plist')
-        appPlistFilename = path.join(contentsDir, 'Info.plist')
+        appPlistFilename = path.join(contentsPath, 'Info.plist')
 
         plist = require('plist')
         appPlist = plist.parse(fs.readFileSync(appPlistFilename).toString())
