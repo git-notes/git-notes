@@ -13,16 +13,8 @@ module.exports = (grunt) ->
     appDir = grunt.config.get("#{pkgName}.appDir")
     appName = grunt.config.get("#{pkgName}.appName")
     executableName = grunt.config.get("#{pkgName}.executableName")
-    rm shellAppDir
+
     rm path.join(buildDir, 'installer')
-    mkdir path.dirname(buildDir)
-
-    switch process.platform
-      when 'darwin'
-        cp "atom-shell/Electron.app", shellAppDir, filter: /default_app/
-      when 'linux', 'win32'
-        cp 'atom-shell', shellAppDir, filter: /default_app/
-
     mkdir appDir
 
     # if process.platform isnt 'win32'
