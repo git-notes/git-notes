@@ -72,7 +72,7 @@ setupCrashReporter = ->
 setupAtomHome = ->
   return if process.env.ATOM_HOME
 
-  atomHome = path.join(app.getHomeDir(), '.atom')
+  atomHome = path.join(app.getHomeDir(), '.xmail')
   try
     atomHome = fs.realpathSync(atomHome)
   process.env.ATOM_HOME = atomHome
@@ -90,9 +90,9 @@ parseCommandLine = ->
   version = app.getVersion()
   options = yargs(process.argv[1..]).wrap(100)
   options.usage """
-    Atom Editor v#{version}
+    Xmail v#{version}
 
-    Usage: atom [options] [path ...]
+    Usage: xmail [options] [path ...]
 
     One or more paths to files or folders may be specified. If there is an
     existing Atom window that contains all of the given folders, the paths
@@ -101,23 +101,20 @@ parseCommandLine = ->
 
     Environment Variables:
 
-      ATOM_DEV_RESOURCE_PATH  The path from which Atom loads source code in dev mode.
-                              Defaults to `~/github/atom`.
+      ATOM_DEV_RESOURCE_PATH  The path from which Xmail loads source code in dev mode.
+                              Defaults to `~/github/xmail`.
 
       ATOM_HOME               The root path for all configuration files and folders.
-                              Defaults to `~/.atom`.
+                              Defaults to `~/.xmail`.
   """
-  # Deprecated 1.0 API preview flag
-  options.alias('1', 'one').boolean('1').describe('1', 'This option is no longer supported.')
-  options.boolean('include-deprecated-apis').describe('include-deprecated-apis', 'This option is not currently supported.')
   options.alias('d', 'dev').boolean('d').describe('d', 'Run in development mode.')
   options.alias('f', 'foreground').boolean('f').describe('f', 'Keep the browser process in the foreground.')
   options.alias('h', 'help').boolean('h').describe('h', 'Print this usage message.')
   options.alias('l', 'log-file').string('l').describe('l', 'Log all output to file.')
   options.alias('n', 'new-window').boolean('n').describe('n', 'Open a new window.')
   options.boolean('profile-startup').describe('profile-startup', 'Create a profile of the startup execution time.')
-  options.alias('r', 'resource-path').string('r').describe('r', 'Set the path to the Atom source directory and enable dev-mode.')
-  options.alias('s', 'spec-directory').string('s').describe('s', 'Set the directory from which to run package specs (default: Atom\'s spec directory).')
+  options.alias('r', 'resource-path').string('r').describe('r', 'Set the path to the Xmail source directory and enable dev-mode.')
+  options.alias('s', 'spec-directory').string('s').describe('s', 'Set the directory from which to run package specs (default: Xmail\'s spec directory).')
   options.boolean('safe').describe('safe', 'Do not load packages from ~/.atom/packages or ~/.atom/dev/packages.')
   options.alias('t', 'test').boolean('t').describe('t', 'Run the specified specs and exit with error code on failures.')
   options.alias('v', 'version').boolean('v').describe('v', 'Print the version.')
@@ -157,7 +154,7 @@ parseCommandLine = ->
       if fs.statSyncNoException(packageManifestPath)
         try
           packageManifest = JSON.parse(fs.readFileSync(packageManifestPath))
-          resourcePath = packageDirectoryPath if packageManifest.name is 'atom'
+          resourcePath = packageDirectoryPath if packageManifest.name is 'xmail'
 
     if devMode
       resourcePath ?= global.devResourcePath

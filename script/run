@@ -10,18 +10,18 @@ var target = path.resolve(__dirname, '..', 'dist/');
 
 var theArgs = process.argv.slice(2);
 if (theArgs.length < 1) {
-  theArgs = ['-r', '.'];
+  theArgs = ['-r', path.resolve('.')];
 }
 
 // Linux
-var cmd = path.join(target, pkgInfo.productName, 'electron');
+var cmd = path.join(target, pkgInfo.productName, pkgInfo.productName);
 
 if (process.platform === 'darwin') {
   cmd = path.join(target, pkgInfo.productName + '.app', 'Contents', 'MacOS', 'Electron');
 }
 
 if (process.platform === 'win32') {
-  cmd = path.join(target, pkgInfo.productName, 'electron.exe');
+  cmd = path.join(target, pkgInfo.productName, pkgInfo.productName + '.exe');
 }
 
 var toRun = cmd + " " + theArgs.join(" ");
