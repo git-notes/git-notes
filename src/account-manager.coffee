@@ -10,7 +10,7 @@ class AccountManager
     @accounts = null
     @emitter = new Emitter
 
-  @registerAccount: (Account) ->
+  @registerAccountModel: (Account) ->
     @accountModels.push Account
 
   loadAccounts: ->

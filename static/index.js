@@ -111,7 +111,7 @@ var setupAtomHome = function() {
     } else {
       home = process.env.HOME;
     }
-    var atomHome = path.join(home, '.atom');
+    var atomHome = path.join(home, '.xmail');
     try {
       atomHome = fs.realpathSync(atomHome);
     } catch (error) {
