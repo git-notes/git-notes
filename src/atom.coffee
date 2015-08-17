@@ -15,6 +15,7 @@ Model = require './model'
 WindowEventHandler = require './window-event-handler'
 StylesElement = require './styles-element'
 StorageFolder = require './storage-folder'
+{AccountTypeRegistry, AccountManager} = require './account-manager'
 
 # Essential: Atom global for dealing with packages, themes, menus, and the window.
 #
@@ -132,6 +133,12 @@ class Atom extends Model
 
   # Public: A {CommandRegistry} instance
   commands: null
+
+  # Public: A {AccountTypeRegistry} instance
+  accountTypes: null
+
+  # Public: A {AccountManager} instance
+  accounts: null
 
   # Public: A {Config} instance
   config: null
@@ -264,6 +271,8 @@ class Atom extends Model
     @tooltips = new TooltipManager
     @notifications = new NotificationManager
     @commands = new CommandRegistry
+    @accountTypes = new AccountTypeRegistry
+    @accounts = new AccountManager(@accountTypes)
     @views = new ViewRegistry
     @registerViewProviders()
     @packages = new PackageManager({devMode, configDirPath, resourcePath, safeMode})

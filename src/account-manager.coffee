@@ -2,21 +2,41 @@ Q = require 'q'
 _ = require 'underscore-plus'
 {Emitter} = require 'event-kit'
 
-module.exports =
-class AccountManager
-  @accountModels = []
-
+class AccountTypeRegistry
   constructor: ->
-    @accounts = null
+    @accountTypes = {}
     @emitter = new Emitter
 
-  @registerAccountModel: (Account) ->
-    @accountModels.push Account
+  register: (accountModel) ->
+    name = accountModel.getTypeName?() or accountModel.name
+    if @accountTypes[name]
+      console.error "The account type #{name} has registered!"
+    else
+      @accountTypes[name] = accountModel
+      @emitter.emit 'did-add', accountModel
+
+  get: (name) -> @accountTypes[name]
+
+  getAll: -> Account for name, Account of @accountTypes
+
+  onAddType: (callback) ->
+    @emitter.on 'did-add', callback
+
+  observeType: (callback) ->
+    callback(Model) for Model in @accountTypes.getAll()
+    @onAddType callback
+
+class AccountManager
+  constructor: (@accountTypeRegistry) ->
+    @accounts = {}
+    @emitter = new Emitter
 
   loadAccounts: ->
-    Q.all (Model.findAll() for Model in accountModels)
-    .then (accountLists) =>
-      @accounts = _.flatten(accountLists, true)
+    @accountTypeRegistry.observeType (type) =>
+      type.findAll().then (accountList) =>
+        for account in accountList
+          @accounts[account.email] = account
+          @emitter.emit 'did-add', account
 
   onDidAdd: (callback) ->
     @emitter.on 'did-add', callback
@@ -26,13 +46,16 @@ class AccountManager
 
   addAccount: (account) ->
     account.save().then ->
-      @accounts.push account
+      @accounts[account.email] = account
       @emitter.emit 'did-add', account
 
   removeAccount: (account) ->
-    account.destroy().then ->
-      @accounts.splice @accounts.indexOf(account), 1
+    email = account.email
+    account.destroy().then =>
+      @accounts[email] = null
       @emitter.emit 'did-remove', account
 
   getAccounts: ->
-    @accounts.slice()
+    account for name, account of @accounts
+
+module.exports = {AccountTypeRegistry, AccountManager}
