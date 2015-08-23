@@ -24,11 +24,7 @@ window.onload = function() {
       throw loadSettingsError;
     }
 
-    var devMode = loadSettings.devMode || !loadSettings.resourcePath.startsWith(process.resourcesPath + path.sep);
-
-    if (devMode) {
-      setupDeprecatedPackages();
-    }
+    // var devMode = loadSettings.devMode || !loadSettings.resourcePath.startsWith(process.resourcesPath + path.sep);
 
     if (loadSettings.profileStartup) {
       profileStartup(loadSettings, Date.now() - startTime);
@@ -74,9 +70,6 @@ var setupWindow = function(loadSettings) {
   ModuleCache = require('../src/module-cache');
   ModuleCache.register(loadSettings);
   ModuleCache.add(loadSettings.resourcePath);
-
-  // Only include deprecated APIs when running core spec
-  require('grim').includeDeprecatedAPIs = isRunningCoreSpecs(loadSettings);
 
   // Start the crash reporter before anything else.
   require('crash-reporter').start({
@@ -148,17 +141,6 @@ var setupVmCompatibility = function() {
   }
 }
 
-var setupDeprecatedPackages = function() {
-  var metadata = require('../package.json');
-  if (!metadata._deprecatedPackages) {
-    try {
-      metadata._deprecatedPackages = require('../build/deprecated-packages.json');
-    } catch(requireError) {
-      console.error('Failed to setup deprecated packages list', requireError.stack);
-    }
-  }
-}
-
 var profileStartup = function(loadSettings, initialTime) {
   var profile = function() {
     console.profile('startup');
@@ -218,14 +200,6 @@ var setupWindowBackground = function() {
       backgroundStylesheet = null;
     }, 1000);
   }, false);
-}
-
-var isRunningCoreSpecs = function(loadSettings) {
-  return !!(loadSettings &&
-    loadSettings.isSpec &&
-    loadSettings.specDirectory &&
-    loadSettings.resourcePath &&
-    path.dirname(loadSettings.specDirectory) === loadSettings.resourcePath);
 }
 
 parseLoadSettings();
