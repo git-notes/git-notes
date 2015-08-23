@@ -11,8 +11,7 @@ _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {convertStackTrace, convertLine} = require 'coffeestack'
 Model = require './model'
-{$} = require './space-pen-extensions'
-WindowEventHandler = require './window-event-handler'
+# WindowEventHandler = require './window-event-handler'
 StylesElement = require './styles-element'
 StorageFolder = require './storage-folder'
 {AccountTypeRegistry, AccountManager} = require './account-manager'
@@ -299,7 +298,7 @@ class Atom extends Model
     DisplayBuffer = require './display-buffer'
     TextEditor = require './text-editor'
 
-    @windowEventHandler = new WindowEventHandler
+    # @windowEventHandler = new WindowEventHandler
 
   # Register the core views as early as possible in case they are needed for
   # package deserialization.
@@ -497,7 +496,7 @@ class Atom extends Model
   # Extended: Focus the current window.
   focus: ->
     ipc.send('call-window-method', 'focus')
-    $(window).focus()
+    window.focus()
 
   # Extended: Show the current window.
   show: ->
@@ -679,7 +678,7 @@ class Atom extends Model
     @project?.destroy()
     @project = null
 
-    @windowEventHandler?.unsubscribe()
+    # @windowEventHandler?.unsubscribe()
 
   openInitialEmptyEditorIfNecessary: ->
     if @getLoadSettings().initialPaths?.length is 0 and @workspace.getPaneItems().length is 0
@@ -776,16 +775,10 @@ class Atom extends Model
   deserializeWorkspaceView: ->
     Workspace = require './workspace'
 
-    if includeDeprecatedAPIs
-      WorkspaceView = require './workspace-view'
-
     startTime = Date.now()
     @workspace = Workspace.deserialize(@state.workspace) ? new Workspace
 
     workspaceElement = @views.getView(@workspace)
-
-    if includeDeprecatedAPIs
-      @__workspaceView = workspaceElement.__spacePenView
 
     @deserializeTimings.workspace = Date.now() - startTime
 

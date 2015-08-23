@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {Disposable} = require 'event-kit'
-{$} = require './space-pen-extensions'
+# {$} = require './space-pen-extensions'
 
 # Essential: Associates tooltips with HTML elements or selectors.
 #
