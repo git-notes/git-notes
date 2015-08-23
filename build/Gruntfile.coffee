@@ -244,7 +244,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask('compile', ['coffee', 'prebuild-less', 'cson', 'peg'])
   grunt.registerTask('lint', ['coffeelint', 'csslint', 'lesslint'])
-  grunt.registerTask('test', ['shell:kill-atom', 'run-specs'])
+  grunt.registerTask('test', ['shell:kill-app', 'run-specs'])
 
   ciTasks = ['output-disk-space', 'download-electron', 'copy-rebrand-electron', 'build']
   ciTasks.push('dump-symbols') if process.platform isnt 'win32'

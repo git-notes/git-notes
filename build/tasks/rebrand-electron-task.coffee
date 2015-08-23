@@ -4,10 +4,10 @@ fs = require 'fs'
 
 module.exports = (grunt) ->
 
-  moveHelpers = (frameworksPath, appName) ->
-    rename = (basePath, oldName, newName) ->
-      fs.renameSync(path.join(basePath, oldName), path.join(basePath, newName))
+  rename = (basePath, oldName, newName) ->
+    fs.renameSync(path.join(basePath, oldName), path.join(basePath, newName))
 
+  moveHelpers = (frameworksPath, appName) ->
     for suffix in [' Helper', ' Helper EH', ' Helper NP']
       executableBasePath = path.join(frameworksPath, 'Electron' + suffix + '.app', 'Contents', 'MacOS')
       rename executableBasePath, 'Electron' + suffix, appName + suffix
@@ -41,6 +41,7 @@ module.exports = (grunt) ->
         appPlist = plist.parse(fs.readFileSync(appPlistFilename).toString())
         helperPlist = plist.parse(fs.readFileSync(helperPlistFilename).toString())
 
+        appPlist.CFBundleExecutable = productName
         appPlist.CFBundleDisplayName = pkgName
         appPlist.CFBundleIdentifier = grunt.config.get("#{@name}.app-bundle-id") or defaultBundleName
         appPlist.CFBundleName = pkgName
@@ -59,6 +60,8 @@ module.exports = (grunt) ->
         fs.writeFileSync(appPlistFilename, plist.build(appPlist))
         fs.writeFileSync(helperPlistFilename, plist.build(helperPlist))
         moveHelpers frameworksPath, productName
+        executableBasePath = path.join(contentsPath, 'MacOS')
+        rename executableBasePath, 'Electron', productName
 
   grunt.registerTask 'copy-rebrand-electron', 'Copy and Rebrand Electron', ->
     {cp, mkdir, rm} = require('./task-helpers')(grunt)

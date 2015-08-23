@@ -34,14 +34,15 @@ module.exports = (grunt) ->
   getAppPath = ->
     pkgName = grunt.config.get 'name'
 
+    productName = grunt.config.get(pkgName + '.productName')
     contentsDir = grunt.config.get(pkgName + '.contentsDir')
     switch process.platform
       when 'darwin'
-        path.join(contentsDir, 'MacOS', pkgName)
+        path.join(contentsDir, 'MacOS', productName)
       when 'linux'
-        path.join(contentsDir, 'atom')
+        path.join(contentsDir, pkgName)
       when 'win32'
-        path.join(contentsDir, 'atom.exe')
+        path.join(contentsDir, pkgName + '.exe')
 
   runPackageSpecs = (callback) ->
     failedPackages = []
