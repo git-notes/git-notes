@@ -118,13 +118,13 @@ class ApplicationMenu
   # Returns an Array of menu item Objects.
   getDefaultTemplate: ->
     [
-      label: "Atom"
+      label: "Xmail"
       submenu: [
           {label: "Check for Update", metadata: {autoUpdate: true}}
-          {label: 'Reload', accelerator: 'Command+R', click: => @focusedWindow()?.reload()}
-          {label: 'Close Window', accelerator: 'Command+Shift+W', click: => @focusedWindow()?.close()}
-          {label: 'Toggle Dev Tools', accelerator: 'Command+Alt+I', click: => @focusedWindow()?.toggleDevTools()}
-          {label: 'Quit', accelerator: 'Command+Q', click: -> app.quit()}
+          {label: 'Reload', click: => @focusedWindow()?.reload()}
+          {label: 'Close Window', click: => @focusedWindow()?.close()}
+          {label: 'Toggle Dev Tools', click: => @focusedWindow()?.toggleDevTools()}
+          {label: 'Quit', click: -> app.quit()}
       ]
     ]
 
