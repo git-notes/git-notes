@@ -174,12 +174,9 @@ class CommandRegistry
   # * `commandName` {String} indicating the name of the command to dispatch.
   dispatch: (target, commandName, detail) ->
     event = new CustomEvent(commandName, {bubbles: true, detail})
-    eventWithTarget = Object.create event,
-      target: value: target
-      preventDefault: value: ->
-      stopPropagation: value: ->
-      stopImmediatePropagation: value: ->
-    @handleCommandEvent(eventWithTarget)
+    Object.defineProperty event, 'target',
+      value: target, configurable: true
+    @handleCommandEvent(event)
 
   onWillDispatch: (callback) ->
     @emitter.on 'will-dispatch', callback
@@ -202,22 +199,26 @@ class CommandRegistry
     matched = false
     currentTarget = originalEvent.target
 
-    syntheticEvent = Object.create originalEvent,
-      eventPhase: value: Event.BUBBLING_PHASE
-      currentTarget: get: -> currentTarget
-      preventDefault: value: ->
-        originalEvent.preventDefault()
-      stopPropagation: value: ->
-        originalEvent.stopPropagation()
-        propagationStopped = true
-      stopImmediatePropagation: value: ->
-        originalEvent.stopImmediatePropagation()
-        propagationStopped = true
-        immediatePropagationStopped = true
-      abortKeyBinding: value: ->
-        originalEvent.abortKeyBinding?()
+    Object.defineProperties originalEvent,
+      eventPhase:
+        configurable: true
+        value: Event.BUBBLING_PHASE
+      currentTarget:
+        configurable: true
+        get: -> currentTarget
+      stopPropagation:
+        configurable: true
+        value: ->
+          originalEvent.stopPropagation()
+          propagationStopped = true
+      stopImmediatePropagation:
+        configurable: true
+        value: ->
+          originalEvent.stopImmediatePropagation()
+          propagationStopped = true
+          immediatePropagationStopped = true
 
-    @emitter.emit 'will-dispatch', syntheticEvent
+    @emitter.emit 'will-dispatch', originalEvent
 
     loop
       listeners = @inlineListenersByCommandName[originalEvent.type]?.get(currentTarget) ? []
@@ -232,7 +233,7 @@ class CommandRegistry
 
       for listener in listeners
         break if immediatePropagationStopped
-        listener.callback.call(currentTarget, syntheticEvent)
+        listener.callback.call(currentTarget, originalEvent)
 
       break if currentTarget is window
       break if propagationStopped

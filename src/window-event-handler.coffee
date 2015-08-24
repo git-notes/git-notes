@@ -1,20 +1,17 @@
 path = require 'path'
-{$} = require './space-pen-extensions'
 {Disposable} = require 'event-kit'
 ipc = require 'ipc'
 shell = require 'shell'
-{Subscriber} = require 'emissary'
 fs = require 'fs-plus'
 
 # Handles low-level events related to the window.
 module.exports =
 class WindowEventHandler
-  Subscriber.includeInto(this)
 
   constructor: ->
     @reloadRequested = false
 
-    @subscribe ipc, 'message', (message, detail) ->
+    ipc.on 'message', (message, detail) ->
       switch message
         when 'open-locations'
           needsProjectPaths = atom.project?.getPaths().length is 0
@@ -42,7 +39,7 @@ class WindowEventHandler
           if workspaceElement = atom.views.getView(atom.workspace)
             atom.commands.dispatch workspaceElement, "window:update-available", detail
 
-    @subscribe ipc, 'command', (command, args...) ->
+    ipc.on 'command', (command, args...) ->
       activeElement = document.activeElement
       # Use the workspace element view if body has focus
       if activeElement is document.body and workspaceElement = atom.views.getView(atom.workspace)
@@ -50,14 +47,16 @@ class WindowEventHandler
 
       atom.commands.dispatch(activeElement, command, args[0])
 
-    @subscribe ipc, 'context-command', (command, args...) ->
+    ipc.on 'context-command', (command, args...) ->
       $(atom.contextMenu.activeElement).trigger(command, args...)
 
-    @subscribe $(window), 'focus', -> document.body.classList.remove('is-blurred')
+    window.addEventListener 'focus', -> document.body.classList.remove('is-blurred')
 
-    @subscribe $(window), 'blur', -> document.body.classList.add('is-blurred')
+    window.addEventListener 'blur', ->
+      document.body.classList.add('is-blurred')
+      atom.storeDefaultWindowDimensions()
 
-    @subscribe $(window), 'beforeunload', =>
+    window.addEventListener 'beforeunload', =>
       confirmed = atom.workspace?.confirmClose(windowCloseRequested: true)
       atom.hide() if confirmed and not @reloadRequested and atom.getCurrentWindow().isWebViewFocused()
       @reloadRequested = false
@@ -71,46 +70,40 @@ class WindowEventHandler
 
       confirmed
 
-    @subscribe $(window), 'blur', -> atom.storeDefaultWindowDimensions()
+    window.addEventListener 'unload', -> atom.removeEditorWindow()
 
-    @subscribe $(window), 'unload', -> atom.removeEditorWindow()
-
-    @subscribeToCommand $(window), 'window:toggle-full-screen', -> atom.toggleFullScreen()
-
-    @subscribeToCommand $(window), 'window:close', -> atom.close()
-
-    @subscribeToCommand $(window), 'window:reload', =>
-      @reloadRequested = true
-      atom.reload()
-
-    @subscribeToCommand $(window), 'window:toggle-dev-tools', -> atom.toggleDevTools()
+    atom.commands.add window,
+      'window:toggle-full-screen': -> atom.toggleFullScreen()
+      'window:close': -> atom.close()
+      'window:reload': =>
+        @reloadRequested = true
+        atom.reload()
+      'window:toggle-dev-tools': -> atom.toggleDevTools()
 
     if process.platform in ['win32', 'linux']
-      @subscribeToCommand $(window), 'window:toggle-menu-bar', ->
+      atom.commands.add window, 'window:toggle-menu-bar', ->
         atom.config.set('core.autoHideMenuBar', not atom.config.get('core.autoHideMenuBar'))
 
-    @subscribeToCommand $(document), 'core:focus-next', @focusNext
-
-    @subscribeToCommand $(document), 'core:focus-previous', @focusPrevious
+    atom.commands.add document,
+      'core:focus-next', @focusNext
+      'core:focus-previous', @focusPrevious
 
     document.addEventListener 'keydown', @onKeydown
 
     document.addEventListener 'drop', @onDrop
-    @subscribe new Disposable =>
-      document.removeEventListener('drop', @onDrop)
 
     document.addEventListener 'dragover', @onDragOver
-    @subscribe new Disposable =>
-      document.removeEventListener('dragover', @onDragOver)
 
-    @subscribe $(document), 'click', 'a', @openLink
+    document.addEventListener 'click', (event) =>
+       @openLink() if event.target.matches('a')
 
     # Prevent form submits from changing the current window's URL
-    @subscribe $(document), 'submit', 'form', (e) -> e.preventDefault()
+    document.addEventListener 'submit', (event) ->
+      event.preventDefault() if event.target.matches('form')
 
-    @subscribe $(document), 'contextmenu', (e) ->
-      e.preventDefault()
-      atom.contextMenu.showForEvent(e)
+    document.addEventListener 'contextmenu', (event) ->
+      event.preventDefault()
+      atom.contextMenu.showForEvent(event)
 
     @handleNativeKeybindings()
 
@@ -119,7 +112,7 @@ class WindowEventHandler
   handleNativeKeybindings: ->
     menu = null
     bindCommandToAction = (command, action) =>
-      @subscribe $(document), command, (event) ->
+      document.addEventListener command, (event) ->
         if event.target.webkitMatchesSelector('.native-key-bindings')
           atom.getCurrentWindow().webContents[action]()
         true
@@ -151,18 +144,20 @@ class WindowEventHandler
     false
 
   eachTabIndexedElement: (callback) ->
-    for element in $('[tabindex]')
-      element = $(element)
-      continue if element.isDisabled()
+    for element in document.querySelectorAll('[tabindex]')
+      continue if element.disabled
 
-      tabIndex = parseInt(element.attr('tabindex'))
+      tabIndex = element.tabIndex
       continue unless tabIndex >= 0
 
       callback(element, tabIndex)
     return
 
+  getFocusedTabIndex = ->
+    document.querySelector(':focus')?.tabIndex or -Infinity
+
   focusNext: =>
-    focusedTabIndex = parseInt($(':focus').attr('tabindex')) or -Infinity
+    focusedTabIndex = getFocusedTabIndex()
 
     nextElement = null
     nextTabIndex = Infinity
@@ -183,7 +178,7 @@ class WindowEventHandler
       lowestElement.focus()
 
   focusPrevious: =>
-    focusedTabIndex = parseInt($(':focus').attr('tabindex')) or Infinity
+    focusedTabIndex = getFocusedTabIndex()
 
     previousElement = null
     previousTabIndex = -Infinity

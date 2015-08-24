@@ -11,7 +11,7 @@ _ = require 'underscore-plus'
 fs = require 'fs-plus'
 {convertStackTrace, convertLine} = require 'coffeestack'
 Model = require './model'
-# WindowEventHandler = require './window-event-handler'
+WindowEventHandler = require './window-event-handler'
 StylesElement = require './styles-element'
 StorageFolder = require './storage-folder'
 {AccountTypeRegistry, AccountManager} = require './account-manager'
@@ -298,7 +298,7 @@ class Atom extends Model
     DisplayBuffer = require './display-buffer'
     TextEditor = require './text-editor'
 
-    # @windowEventHandler = new WindowEventHandler
+    @windowEventHandler = new WindowEventHandler
 
   # Register the core views as early as possible in case they are needed for
   # package deserialization.
