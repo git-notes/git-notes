@@ -79,3 +79,13 @@ repeat these steps to upgrade to future releases.
 * [OS X](docs/build-instructions/os-x.md)
 * [FreeBSD](docs/build-instructions/freebsd.md)
 * [Windows](docs/build-instructions/windows.md)
+
+## Roadmap
+
+* Account tree that show account information.
+* Mail list that show the mail description. For mail list, there are two modes:
+  * All mail mode: show all of the mail by date.
+  * Merged mail mode: show mail list after the mails are merged.
+* Mail details UI that show the mail information.
+* Message editor that can edit with markdown syntax.
+* Add support for Exchange, IMAP/SMTP, POP3/SMTP protocols.
