@@ -678,7 +678,7 @@ class Atom extends Model
     @project?.destroy()
     @project = null
 
-    # @windowEventHandler?.unsubscribe()
+    @windowEventHandler?.unsubscribe()
 
   openInitialEmptyEditorIfNecessary: ->
     if @getLoadSettings().initialPaths?.length is 0 and @workspace.getPaneItems().length is 0

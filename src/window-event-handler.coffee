@@ -1,8 +1,8 @@
 path = require 'path'
-{Disposable} = require 'event-kit'
 ipc = require 'ipc'
 shell = require 'shell'
 fs = require 'fs-plus'
+{CompositeDisposable, Disposable} = require 'event-kit'
 
 # Handles low-level events related to the window.
 module.exports =
@@ -10,8 +10,9 @@ class WindowEventHandler
 
   constructor: ->
     @reloadRequested = false
+    @subscriptions = new CompositeDisposable
 
-    ipc.on 'message', (message, detail) ->
+    @subscribeIpc 'message', (message, detail) ->
       switch message
         when 'open-locations'
           needsProjectPaths = atom.project?.getPaths().length is 0
@@ -39,7 +40,7 @@ class WindowEventHandler
           if workspaceElement = atom.views.getView(atom.workspace)
             atom.commands.dispatch workspaceElement, "window:update-available", detail
 
-    ipc.on 'command', (command, args...) ->
+    @subscribeIpc 'command', (command, args...) ->
       activeElement = document.activeElement
       # Use the workspace element view if body has focus
       if activeElement is document.body and workspaceElement = atom.views.getView(atom.workspace)
@@ -47,16 +48,16 @@ class WindowEventHandler
 
       atom.commands.dispatch(activeElement, command, args[0])
 
-    ipc.on 'context-command', (command, args...) ->
+    @subscribeIpc 'context-command', (command, args...) ->
       $(atom.contextMenu.activeElement).trigger(command, args...)
 
-    window.addEventListener 'focus', -> document.body.classList.remove('is-blurred')
+    @subscribeEvent window, 'focus', -> document.body.classList.remove('is-blurred')
 
-    window.addEventListener 'blur', ->
+    @subscribeEvent window, 'blur', ->
       document.body.classList.add('is-blurred')
       atom.storeDefaultWindowDimensions()
 
-    window.addEventListener 'beforeunload', =>
+    @subscribeEvent window, 'beforeunload', =>
       confirmed = atom.workspace?.confirmClose(windowCloseRequested: true)
       atom.hide() if confirmed and not @reloadRequested and atom.getCurrentWindow().isWebViewFocused()
       @reloadRequested = false
@@ -70,9 +71,9 @@ class WindowEventHandler
 
       confirmed
 
-    window.addEventListener 'unload', -> atom.removeEditorWindow()
+    @subscribeEvent window, 'unload', -> atom.removeEditorWindow()
 
-    atom.commands.add window,
+    @subscriptions.add atom.commands.add window,
       'window:toggle-full-screen': -> atom.toggleFullScreen()
       'window:close': -> atom.close()
       'window:reload': =>
@@ -81,38 +82,49 @@ class WindowEventHandler
       'window:toggle-dev-tools': -> atom.toggleDevTools()
 
     if process.platform in ['win32', 'linux']
-      atom.commands.add window, 'window:toggle-menu-bar', ->
+      @subscriptions.add atom.commands.add window, 'window:toggle-menu-bar', ->
         atom.config.set('core.autoHideMenuBar', not atom.config.get('core.autoHideMenuBar'))
 
-    atom.commands.add document,
+    @subscriptions.add atom.commands.add document,
       'core:focus-next', @focusNext
       'core:focus-previous', @focusPrevious
 
-    document.addEventListener 'keydown', @onKeydown
+    @subscribeEvent document, 'keydown', @onKeydown
 
-    document.addEventListener 'drop', @onDrop
+    @subscribeEvent document, 'drop', @onDrop
 
-    document.addEventListener 'dragover', @onDragOver
+    @subscribeEvent document, 'dragover', @onDragOver
 
-    document.addEventListener 'click', (event) =>
+    @subscribeEvent document, 'click', (event) =>
        @openLink() if event.target.matches('a')
 
     # Prevent form submits from changing the current window's URL
-    document.addEventListener 'submit', (event) ->
+    @subscribeEvent document, 'submit', (event) ->
       event.preventDefault() if event.target.matches('form')
 
-    document.addEventListener 'contextmenu', (event) ->
+    @subscribeEvent document, 'contextmenu', (event) ->
       event.preventDefault()
       atom.contextMenu.showForEvent(event)
 
     @handleNativeKeybindings()
+
+  subscribeIpc: (name, callback) ->
+    ipc.on name, callback
+    @subscriptions.add new Disposable -> ipc.removeListener name, callback
+
+  subscribeEvent: (element, event, callback) ->
+    element.addEventListener event, callback
+    @subscriptions.add new Disposable -> element.removeEventListener event, callback
+
+  unsubscribe: ->
+    @subscriptions.dispose()
 
   # Wire commands that should be handled by Chromium for elements with the
   # `.native-key-bindings` class.
   handleNativeKeybindings: ->
     menu = null
     bindCommandToAction = (command, action) =>
-      document.addEventListener command, (event) ->
+      @subscribeEvent document, command, (event) ->
         if event.target.webkitMatchesSelector('.native-key-bindings')
           atom.getCurrentWindow().webContents[action]()
         true
