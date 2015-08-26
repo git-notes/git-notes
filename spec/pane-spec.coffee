@@ -344,13 +344,6 @@ describe "Pane", ->
 
       expect(observed).toEqual [item1, item2, item3]
 
-  describe "when an item emits a destroyed event", ->
-    it "removes it from the list of items", ->
-      pane = new Pane(items: [new Item("A"), new Item("B"), new Item("C")])
-      [item1, item2, item3] = pane.getItems()
-      pane.itemAtIndex(1).destroy()
-      expect(pane.getItems()).toEqual [item1, item3]
-
   describe "::destroyInactiveItems()", ->
     it "destroys all items but the active item", ->
       pane = new Pane(items: [new Item("A"), new Item("B"), new Item("C")])
@@ -524,7 +517,7 @@ describe "Pane", ->
 
     describe "when the moved item the last item in the source pane", ->
       beforeEach ->
-        item5.destroy()
+        pane2.destroyItem(item5)
 
       describe "when the 'core.destroyEmptyPanes' config option is false (the default)", ->
         it "does not destroy the pane or the item", ->

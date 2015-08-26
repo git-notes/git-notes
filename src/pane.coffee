@@ -15,20 +15,21 @@ class Pane extends Model
   atom.deserializers.add(this)
   Serializable.includeInto(this)
 
-  constructor: (params) ->
+  constructor: (params={}) ->
     super
 
     unless Grim.includeDeprecatedAPIs
-      @container = params?.container
-      @activeItem = params?.activeItem
+      @container = params.container
+      @activeItem = params.activeItem
 
     @emitter = new Emitter
     @itemSubscriptions = new WeakMap
     @items = []
 
-    @addItems(compact(params?.items ? []))
+    @addItems(compact(params.items ? []))
     @setActiveItem(@items[0]) unless @getActiveItem()?
-    @setFlexScale(params?.flexScale ? 1)
+    @setFlexScale(params.flexScale ? 1)
+    @focus() if params.focused
 
   # Called by the Serializable mixin during serialization.
   serializeParams: ->
