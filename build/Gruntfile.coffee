@@ -121,27 +121,27 @@ module.exports = (grunt) ->
       dest: appDir
       ext: '.js'
 
-  # for child in fs.readdirSync('node_modules') when child isnt '.bin'
-  #   directory = path.join('node_modules', child)
-  #   metadataPath = path.join(directory, 'package.json')
-  #   continue unless grunt.file.isFile(metadataPath)
-  #
-  #   {engines, theme} = grunt.file.readJSON(metadataPath)
-  #   if engines?.atom?
-  #     coffeeConfig.glob_to_multiple.src.push("#{directory}/**/*.coffee")
-  #     coffeeConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.coffee")
-  #
-  #     lessConfig.glob_to_multiple.src.push("#{directory}/**/*.less")
-  #     lessConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.less")
-  #
-  #     unless theme
-  #       prebuildLessConfig.src.push("#{directory}/**/*.less")
-  #       prebuildLessConfig.src.push("!#{directory}/spec/**/*.less")
-  #
-  #     csonConfig.glob_to_multiple.src.push("#{directory}/**/*.cson")
-  #     csonConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.cson")
-  #
-  #     pegConfig.glob_to_multiple.src.push("#{directory}/lib/*.pegjs")
+  for child in fs.readdirSync('node_modules') when child isnt '.bin'
+    directory = path.join('node_modules', child)
+    metadataPath = path.join(directory, 'package.json')
+    continue unless grunt.file.isFile(metadataPath)
+
+    {engines, theme} = grunt.file.readJSON(metadataPath)
+    if engines?.atom?
+      coffeeConfig.glob_to_multiple.src.push("#{directory}/**/*.coffee")
+      coffeeConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.coffee")
+
+      lessConfig.glob_to_multiple.src.push("#{directory}/**/*.less")
+      lessConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.less")
+
+      unless theme
+        prebuildLessConfig.src.push("#{directory}/**/*.less")
+        prebuildLessConfig.src.push("!#{directory}/spec/**/*.less")
+
+      csonConfig.glob_to_multiple.src.push("#{directory}/**/*.cson")
+      csonConfig.glob_to_multiple.src.push("!#{directory}/spec/**/*.cson")
+
+      pegConfig.glob_to_multiple.src.push("#{directory}/lib/*.pegjs")
 
   opts =
     name: pkgName
