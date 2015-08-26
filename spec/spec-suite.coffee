@@ -48,8 +48,9 @@ runAllSpecs = ->
   requireSpecs(path.join(packagePath, 'spec')) for packagePath in packagePaths.user ? []
   setSpecType('user')
 
-if specDirectory = atom.getLoadSettings().specDirectory
-  requireSpecs(specDirectory)
-  setSpecType('user')
-else
-  runAllSpecs()
+# if specDirectory = atom.getLoadSettings().specDirectory
+#   requireSpecs(specDirectory)
+#   setSpecType('user')
+# else
+  # runAllSpecs()
+require './pane-spec'

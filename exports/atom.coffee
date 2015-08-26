@@ -25,7 +25,7 @@ unless process.env.ATOM_SHELL_INTERNAL_RUN_AS_NODE
   module.exports.TextEditor = require '../src/text-editor'
 
   if includeDeprecatedAPIs
-    {$, $$, $$$, View} = require '../src/space-pen-extensions'
+    # {$, $$, $$$, View} = require '../src/space-pen-extensions'
 
     Object.defineProperty module.exports, 'Workspace', get: ->
       deprecate """

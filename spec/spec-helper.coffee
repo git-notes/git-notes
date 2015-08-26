@@ -3,7 +3,7 @@ atom.initialize()
 atom.restoreWindowDimensions()
 
 require 'jasmine-json'
-require '../vendor/jasmine-jquery'
+# require '../vendor/jasmine-jquery'
 path = require 'path'
 _ = require 'underscore-plus'
 fs = require 'fs-plus'
@@ -11,7 +11,7 @@ Grim = require 'grim'
 KeymapManager = require '../src/keymap-extensions'
 
 # FIXME: Remove jquery from this
-{$} = require '../src/space-pen-extensions'
+# {$} = require '../src/space-pen-extensions'
 
 Config = require '../src/config'
 {Point} = require 'text-buffer'
@@ -41,7 +41,7 @@ window.addEventListener 'core:close', -> window.close()
 window.addEventListener 'beforeunload', ->
   atom.storeWindowDimensions()
   atom.saveSync()
-$('html,body').css('overflow', 'auto')
+document.body.style.overflow = 'auto'
 
 # Allow document.title to be assigned in specs without screwing up spec window title
 documentTitle = null
@@ -91,7 +91,6 @@ if specDirectory
 isCoreSpec = specDirectory is fs.realpathSync(__dirname)
 
 beforeEach ->
-  $.fx.off = true
   documentTitle = null
   projectPath = specProjectPath ? path.join(@specDirectory, 'fixtures')
   atom.packages.serviceHub = new ServiceHub
@@ -163,6 +162,9 @@ beforeEach ->
 
   addCustomMatchers(this)
 
+removeChildren = (parent) ->
+  parent.removeChild(child) for child in parent.children
+
 afterEach ->
   atom.packages.deactivatePackages()
   atom.menu.template = []
@@ -181,7 +183,7 @@ afterEach ->
 
   delete atom.state.packageStates
 
-  $('#jasmine-content').empty() unless window.debugContent
+  removeChildren(document.getElementById('jasmine-content')) unless window.debugContent
 
   jasmine.unspy(atom, 'saveSync')
   ensureNoPathSubscriptions()
@@ -392,27 +394,27 @@ window.setEditorHeightInLines = (editorView, heightInLines, lineHeight=editorVie
   editorView.height(editorView.getEditor().getLineHeightInPixels() * heightInLines)
   editorView.component?.measureDimensions()
 
-$.fn.resultOfTrigger = (type) ->
-  event = $.Event(type)
-  this.trigger(event)
-  event.result
-
-$.fn.enableKeymap = ->
-  @on 'keydown', (e) ->
-    originalEvent = e.originalEvent ? e
-    Object.defineProperty(originalEvent, 'target', get: -> e.target) unless originalEvent.target?
-    atom.keymaps.handleKeyboardEvent(originalEvent)
-    not e.originalEvent.defaultPrevented
-
-$.fn.attachToDom = ->
-  @appendTo($('#jasmine-content')) unless @isOnDom()
-
-$.fn.simulateDomAttachment = ->
-  $('<html>').append(this)
-
-$.fn.textInput = (data) ->
-  this.each ->
-    event = document.createEvent('TextEvent')
-    event.initTextEvent('textInput', true, true, window, data)
-    event = $.event.fix(event)
-    $(this).trigger(event)
+# $.fn.resultOfTrigger = (type) ->
+#   event = $.Event(type)
+#   this.trigger(event)
+#   event.result
+#
+# $.fn.enableKeymap = ->
+#   @on 'keydown', (e) ->
+#     originalEvent = e.originalEvent ? e
+#     Object.defineProperty(originalEvent, 'target', get: -> e.target) unless originalEvent.target?
+#     atom.keymaps.handleKeyboardEvent(originalEvent)
+#     not e.originalEvent.defaultPrevented
+#
+# $.fn.attachToDom = ->
+#   @appendTo($('#jasmine-content')) unless @isOnDom()
+#
+# $.fn.simulateDomAttachment = ->
+#   $('<html>').append(this)
+#
+# $.fn.textInput = (data) ->
+#   this.each ->
+#     event = document.createEvent('TextEvent')
+#     event.initTextEvent('textInput', true, true, window, data)
+#     event = $.event.fix(event)
+#     $(this).trigger(event)

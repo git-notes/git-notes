@@ -1,8 +1,6 @@
 fs = require 'fs'
 
 module.exports.runSpecSuite = (specSuite, logFile, logErrors=true) ->
-  {$, $$} = require '../src/space-pen-extensions'
-
   window[key] = value for key, value of require '../vendor/jasmine'
 
   {TerminalReporter} = require 'jasmine-tagged'
@@ -47,7 +45,8 @@ module.exports.runSpecSuite = (specSuite, logFile, logErrors=true) ->
   jasmineEnv.addReporter(timeReporter)
   jasmineEnv.setIncludedTags([process.platform])
 
-  $('body').append $$ -> @div id: 'jasmine-content'
+  View = require 'space-view'
+  document.body.appendChild  View.render -> @div id: 'jasmine-content'
 
   jasmineEnv.execute()
 

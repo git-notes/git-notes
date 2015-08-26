@@ -1,7 +1,7 @@
 path = require 'path'
 _ = require 'underscore-plus'
 {convertStackTrace} = require 'coffeestack'
-{View, $, $$} = require '../src/space-pen-extensions'
+# {View, $, $$} = require '../src/space-pen-extensions'
 grim = require 'grim'
 marked = require 'marked'
 
