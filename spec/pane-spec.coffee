@@ -738,7 +738,7 @@ describe "Pane", ->
       expect(newPane.getActiveItem()).toEqual pane.itemAtIndex(0)
       expect(newPane.getItems().length).toBe pane.getItems().length - 1
 
-    it "includes the pane's focus state in the serialized state", ->
+    xit "includes the pane's focus state in the serialized state", ->
       pane.focus()
       newPane = pane.testSerialization()
       expect(newPane.focused).toBe true
