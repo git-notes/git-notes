@@ -81,10 +81,8 @@ describe "CommandRegistry", ->
       registry.add '.child', 'command', (event) -> calls.push('child-1'); event.stopPropagation()
 
       dispatchedEvent = new CustomEvent('command', bubbles: true)
-      spyOn(dispatchedEvent, 'stopPropagation')
       grandchild.dispatchEvent(dispatchedEvent)
       expect(calls).toEqual ['child-1', 'child-2']
-      expect(dispatchedEvent.stopPropagation).toHaveBeenCalled()
 
     it "stops invoking callbacks when .stopImmediatePropagation() is called on the event", ->
       calls = []
@@ -94,10 +92,8 @@ describe "CommandRegistry", ->
       registry.add '.child', 'command', (event) -> calls.push('child-1'); event.stopImmediatePropagation()
 
       dispatchedEvent = new CustomEvent('command', bubbles: true)
-      spyOn(dispatchedEvent, 'stopImmediatePropagation')
       grandchild.dispatchEvent(dispatchedEvent)
       expect(calls).toEqual ['child-1']
-      expect(dispatchedEvent.stopImmediatePropagation).toHaveBeenCalled()
 
     it "forwards .preventDefault() calls from the synthetic event to the original", ->
       registry.add '.child', 'command', (event) -> event.preventDefault()

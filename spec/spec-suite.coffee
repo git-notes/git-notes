@@ -54,3 +54,4 @@ runAllSpecs = ->
 # else
   # runAllSpecs()
 require './pane-spec'
+require './command-registry-spec'

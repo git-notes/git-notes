@@ -199,6 +199,8 @@ class CommandRegistry
     matched = false
     currentTarget = originalEvent.target
 
+    originalStopPropagation = originalEvent.stopPropagation
+    originalStopImmediatePropagation = originalEvent.stopImmediatePropagation
     Object.defineProperties originalEvent,
       eventPhase:
         configurable: true
@@ -209,12 +211,12 @@ class CommandRegistry
       stopPropagation:
         configurable: true
         value: ->
-          originalEvent.stopPropagation()
+          originalStopPropagation.call(this)
           propagationStopped = true
       stopImmediatePropagation:
         configurable: true
         value: ->
-          originalEvent.stopImmediatePropagation()
+          originalStopImmediatePropagation.call(this)
           propagationStopped = true
           immediatePropagationStopped = true
 
