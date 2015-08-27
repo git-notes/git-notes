@@ -3,6 +3,8 @@ require('crash-reporter').start(productName: 'Atom', companyName: 'GitHub')
 
 path = require 'path'
 
+localStorage.clear()
+
 try
   require '../src/window'
   Atom = require '../src/atom'
