@@ -6,6 +6,7 @@ Thumbs.db
 .svn
 .nvm-version
 node_modules
+!spec/fixtures/**/node_modules
 npm-debug.log
 debug.log
 /tags

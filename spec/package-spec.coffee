@@ -1,4 +1,4 @@
-{$} = require '../src/space-pen-extensions'
+# $ = require '../src/space-pen-extensions'
 path = require 'path'
 Package = require '../src/package'
 ThemePackage = require '../src/theme-package'
