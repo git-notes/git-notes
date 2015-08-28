@@ -56,3 +56,4 @@ runAllSpecs = ->
 require './pane-spec'
 require './command-registry-spec'
 require './package-spec'
+require './package-manager-spec'
