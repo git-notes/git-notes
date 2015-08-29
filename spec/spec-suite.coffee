@@ -53,8 +53,11 @@ runAllSpecs = ->
 #   setSpecType('user')
 # else
   # runAllSpecs()
+
 require './pane-spec'
 require './command-registry-spec'
 require './package-spec'
 require './package-manager-spec'
 require './styles-element-spec'
+require './style-manager-spec'
+require './atom-protocol-handler-spec'
