@@ -163,7 +163,7 @@ beforeEach ->
   addCustomMatchers(this)
 
 removeChildren = (parent) ->
-  parent.removeChild(child) for child in parent.children
+  parent.removeChild(parent.children[0]) while parent.children.length > 0
 
 afterEach ->
   atom.packages.deactivatePackages()
