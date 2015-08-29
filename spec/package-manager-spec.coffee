@@ -722,7 +722,7 @@ describe "PackageManager", ->
         one = require.resolve("./fixtures/packages/package-with-style-sheets-manifest/styles/1.css")
         two = require.resolve("./fixtures/packages/package-with-style-sheets-manifest/styles/2.less")
         three = require.resolve("./fixtures/packages/package-with-style-sheets-manifest/styles/3.css")
-        console.log atom.themes.stylesheetElementForId(one)
+
         expect(atom.themes.stylesheetElementForId(one)).toBeNull()
         expect(atom.themes.stylesheetElementForId(two)).toBeNull()
         expect(atom.themes.stylesheetElementForId(three)).toBeNull()
@@ -888,7 +888,8 @@ describe "PackageManager", ->
       try
         fs.mkdirSync(autocompleteCSSPath)
         fs.writeFileSync(path.join(autocompleteCSSPath, 'package.json'), '{}')
-        fs.symlinkSync(path.join(fixturePath, 'package-with-main'), autocompletePlusPath, 'dir')
+        type = if process.platform is 'win32' then 'junction' else 'dir'
+        fs.symlinkSync(path.join(fixturePath, 'package-with-main'), autocompletePlusPath, type)
 
       expect(fs.isDirectorySync(autocompleteCSSPath)).toBe true
       expect(fs.isSymbolicLinkSync(autocompletePlusPath)).toBe true
@@ -900,6 +901,7 @@ describe "PackageManager", ->
         fs.unlink autocompletePlusPath, ->
 
     it "removes the packages", ->
+      spyOn(console, 'warn')
       atom.packages.loadPackages()
 
       waitsFor ->
