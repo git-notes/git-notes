@@ -203,6 +203,7 @@ class ThemeManager
       @requireStylesheet(nativeStylesheetPath)
 
   stylesheetElementForId: (id) ->
+    id = id.replace(/\\/g, '\\\\')
     document.head.querySelector("atom-styles style[source-path=\"#{id}\"]")
 
   resolveStylesheet: (stylesheetPath) ->
@@ -256,8 +257,7 @@ class ThemeManager
   applyStylesheet: (path, text) ->
     @styleSheetDisposablesBySourcePath[path] = atom.styles.addStyleSheet(text, sourcePath: path)
 
-  stringToId: (string) ->
-    string.replace(/\\/g, '/')
+  stringToId: (string) -> string
 
   activateThemes: ->
     deferred = Q.defer()
