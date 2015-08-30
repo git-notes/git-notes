@@ -130,7 +130,7 @@ beforeEach ->
   spyOn(Config::, 'save')
   config = new Config({resourcePath, configDirPath: atom.getConfigDirPath()})
   atom.config = config
-  atom.loadConfig()
+  # atom.loadConfig()
   config.set "core.destroyEmptyPanes", false
   config.set "editor.fontFamily", "Courier"
   config.set "editor.fontSize", 16
@@ -296,7 +296,7 @@ window.keydownEvent = (key, properties={}) ->
   originalEventProperties.cmd = properties.metaKey
   originalEventProperties.target = properties.target?[0] ? properties.target
   originalEventProperties.which = properties.which
-  originalEvent = KeymapManager.keydownEvent(key, originalEventProperties)
+  originalEvent = KeymapManager.buildKeydownEvent(key, originalEventProperties)
   properties = $.extend({originalEvent}, properties)
   $.Event("keydown", properties)
 

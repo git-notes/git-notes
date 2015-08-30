@@ -1,6 +1,6 @@
 path = require 'path'
 
-{$, $$} = require '../src/space-pen-extensions'
+# {$, $$} = require '../src/space-pen-extensions'
 fs = require 'fs-plus'
 temp = require 'temp'
 
