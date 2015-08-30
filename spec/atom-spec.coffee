@@ -21,8 +21,8 @@ describe "the `atom` global", ->
         atom.setSize(originalSize.width, originalSize.height)
 
       it 'sets the size of the window, and can retrieve the size just set', ->
-        atom.setSize(100, 400)
-        expect(atom.getSize()).toEqual width: 100, height: 400
+        atom.setSize(200, 400)
+        expect(atom.getSize()).toEqual width: 200, height: 400
 
   describe ".isReleasedVersion()", ->
     it "returns false if the version is a SHA and true otherwise", ->
@@ -38,22 +38,24 @@ describe "the `atom` global", ->
     afterEach ->
       subscription?.dispose()
 
-    it "invokes onUpdateAvailable listeners", ->
-      updateAvailableHandler = jasmine.createSpy("update-available-handler")
-      subscription = atom.onUpdateAvailable updateAvailableHandler
+    if process.platform isnt 'win32'
+      it "invokes onUpdateAvailable listeners", ->
+        updateAvailableHandler = jasmine.createSpy("update-available-handler")
+        subscription = atom.onUpdateAvailable updateAvailableHandler
 
-      autoUpdater = require('remote').require('auto-updater')
-      autoUpdater.emit 'update-downloaded', null, "notes", "version"
+        autoUpdater = require('remote').require('auto-updater')
+        autoUpdater.emit 'update-downloaded', null, "notes", "version"
 
-      waitsFor ->
-        updateAvailableHandler.callCount > 0
+        waitsFor ->
+          updateAvailableHandler.callCount > 0
 
-      runs ->
-        {releaseVersion} = updateAvailableHandler.mostRecentCall.args[0]
-        expect(releaseVersion).toBe 'version'
+        runs ->
+          {releaseVersion} = updateAvailableHandler.mostRecentCall.args[0]
+          expect(releaseVersion).toBe 'version'
 
   describe "loading default config", ->
     it 'loads the default core config', ->
+      atom.loadConfig()
       expect(atom.config.get('core.excludeVcsIgnoredPaths')).toBe true
       expect(atom.config.get('core.followSymlinks')).toBe true
       expect(atom.config.get('editor.showInvisibles')).toBe false
