@@ -25,6 +25,7 @@ TokenizedBuffer = require '../src/tokenized-buffer'
 TextEditorComponent = require '../src/text-editor-component'
 pathwatcher = require 'pathwatcher'
 clipboard = require '../src/safe-clipboard'
+require './spec-matchers'
 
 atom.themes.loadBaseStylesheets()
 atom.themes.requireStylesheet '../static/jasmine'

@@ -840,6 +840,7 @@ describe "PackageManager", ->
 
       beforeEach ->
         waitsForPromise ->
+          atom.config.set('core.themes', ['atom-dark-ui', 'atom-dark-syntax'])
           atom.themes.activateThemes()
 
       afterEach ->
@@ -848,7 +849,7 @@ describe "PackageManager", ->
       it "enables and disables a theme", ->
         packageName = 'theme-with-package-file'
 
-        expect(atom.config.get('core.themes')).not.toContain packageName
+        expect(atom.config.get('core.themes') ? []).not.toContain packageName
         expect(atom.config.get('core.disabledPackages')).not.toContain packageName
 
         # enabling of theme
