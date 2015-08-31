@@ -7,7 +7,7 @@ describe "BufferedProcess", ->
     [oldOnError] = []
     beforeEach ->
       oldOnError = window.onerror
-      window.onerror = jasmine.createSpy()
+      window.onerror = jasmine.createSpy().andReturn(true)
 
     afterEach ->
       window.onerror = oldOnError
@@ -15,13 +15,17 @@ describe "BufferedProcess", ->
     describe "when there is an error handler specified", ->
       describe "when an error event is emitted by the process", ->
         it "calls the error handler and does not throw an exception", ->
-          process = new BufferedProcess
+          if process.platform is 'win32'
+            spyOn(ChildProcess, 'spawn').andCallFake ->
+              throw new Error('spawn bad-command-nope ENOENT')
+
+          newProcess = new BufferedProcess
             command: 'bad-command-nope'
             args: ['nothing']
             options: {}
 
           errorSpy = jasmine.createSpy().andCallFake (error) -> error.handle()
-          process.onWillThrowError(errorSpy)
+          newProcess.onWillThrowError(errorSpy)
 
           waitsFor -> errorSpy.callCount > 0
 
@@ -54,7 +58,14 @@ describe "BufferedProcess", ->
 
     describe "when there is not an error handler specified", ->
       it "calls the error handler and does not throw an exception", ->
-        process = new BufferedProcess
+        if process.platform is 'win32'
+          spyOn(ChildProcess, 'spawn').andCallFake ->
+            error = new Error('Failed to spawn command `bad-command-nope`')
+            error.code = 'ENOENT'
+            error.syscall = 'spawn'
+            throw error
+
+        new BufferedProcess
           command: 'bad-command-nope'
           args: ['nothing']
           options: {}
@@ -67,18 +78,11 @@ describe "BufferedProcess", ->
           expect(window.onerror.mostRecentCall.args[4].name).toBe 'BufferedProcessError'
 
   describe "on Windows", ->
-    originalPlatform = null
+    [originalPlatform] = []
 
     beforeEach ->
       # Prevent any commands from actually running and affecting the host
-      originalSpawn = ChildProcess.spawn
       spyOn(ChildProcess, 'spawn').andCallFake ->
-        # Just spawn something that won't actually modify the host
-        if originalPlatform is 'win32'
-          originalSpawn('dir')
-        else
-          originalSpawn('ls')
-
       originalPlatform = process.platform
       Object.defineProperty process, 'platform', value: 'win32'
 
@@ -87,15 +91,15 @@ describe "BufferedProcess", ->
 
     describe "when the explorer command is spawned on Windows", ->
       it "doesn't quote arguments of the form /root,C...", ->
-        new BufferedProcess({command: 'explorer.exe', args: ['/root,C:\\foo']})
+        process = new BufferedProcess({command: 'explorer.exe', args: ['/root,C:\\foo']})
         expect(ChildProcess.spawn.argsForCall[0][1][2]).toBe '"explorer.exe /root,C:\\foo"'
 
     it "spawns the command using a cmd.exe wrapper", ->
-      new BufferedProcess({command: 'dir'})
+      new BufferedProcess({command: 'cd'})
       expect(path.basename(ChildProcess.spawn.argsForCall[0][0])).toBe 'cmd.exe'
       expect(ChildProcess.spawn.argsForCall[0][1][0]).toBe '/s'
       expect(ChildProcess.spawn.argsForCall[0][1][1]).toBe '/c'
-      expect(ChildProcess.spawn.argsForCall[0][1][2]).toBe '"dir"'
+      expect(ChildProcess.spawn.argsForCall[0][1][2]).toBe '"cd"'
 
   it "calls the specified stdout, stderr, and exit callbacks ", ->
     stdout = ''
