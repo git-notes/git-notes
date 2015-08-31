@@ -41,6 +41,8 @@ class BufferedNodeProcess extends BufferedProcess
         # Use a helper to prevent an icon from appearing on the Dock
         path.resolve(process.resourcesPath, '..', 'Frameworks',
                      'Atom Helper.app', 'Contents', 'MacOS', 'Atom Helper')
+      else if process.platform is 'win32'
+        'node'
       else
         process.execPath
 
