@@ -6,6 +6,9 @@ url = require 'url'
 module.exports =
 class DefaultDirectoryProvider
 
+  isWin32AbsolutePath: (uri) ->
+    process.platform is 'win32' and /^\w:\\/.test(uri)
+    
   # Public: Create a Directory that corresponds to the specified URI.
   #
   # * `uri` {String} The path to the directory to add. This is guaranteed not to
@@ -17,7 +20,7 @@ class DefaultDirectoryProvider
   directoryForURISync: (uri) ->
     normalizedPath = path.normalize(uri)
     {protocol} = url.parse(uri)
-    directoryPath = if protocol?
+    directoryPath = if protocol? and not @isWin32AbsolutePath(uri)
       uri
     else if not fs.isDirectorySync(normalizedPath) and fs.isDirectorySync(path.dirname(normalizedPath))
       path.dirname(normalizedPath)
