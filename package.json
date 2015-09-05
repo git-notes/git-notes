@@ -78,7 +78,8 @@
     "one-light-ui": "1.0.2",
     "solarized-dark-syntax": "0.38.1",
     "solarized-light-syntax": "0.22.1",
-    "about": "1.0.1"
+    "about": "1.0.1",
+    "language-javascript": "0.89.0"
   },
   "private": true,
   "scripts": {

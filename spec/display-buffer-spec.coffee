@@ -233,7 +233,8 @@ describe "DisplayBuffer", ->
       describe "when a newline is inserted, deleted, and re-inserted at the end of a wrapped line (regression)", ->
         it "correctly renders the original wrapped line", ->
           buffer = atom.project.buildBufferSync(null, '')
-          displayBuffer = new DisplayBuffer({buffer, tabLength, editorWidthInChars: 30, softWrapped: true})
+          displayBuffer = new DisplayBuffer({buffer, tabLength, editorWidthInChars: 30})
+          displayBuffer.setSoftWrapped(true)
 
           buffer.insert([0, 0], "the quick brown fox jumps over the lazy dog.")
           buffer.insert([0, Infinity], '\n')
@@ -804,7 +805,6 @@ describe "DisplayBuffer", ->
     it "unsubscribes all display buffer markers from their underlying buffer marker (regression)", ->
       marker = displayBuffer.markBufferPosition([12, 2])
       displayBuffer.destroy()
-      expect(marker.bufferMarker.getSubscriptionCount()).toBe 0
       expect( -> buffer.insert([12, 2], '\n')).not.toThrow()
 
   describe "markers", ->

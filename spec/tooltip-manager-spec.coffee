@@ -1,5 +1,4 @@
 TooltipManager = require '../src/tooltip-manager'
-{$} = require '../src/space-pen-extensions'
 _ = require "underscore-plus"
 
 describe "TooltipManager", ->

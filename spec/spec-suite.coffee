@@ -48,24 +48,29 @@ runAllSpecs = ->
   requireSpecs(path.join(packagePath, 'spec')) for packagePath in packagePaths.user ? []
   setSpecType('user')
 
-# if specDirectory = atom.getLoadSettings().specDirectory
-#   requireSpecs(specDirectory)
-#   setSpecType('user')
-# else
+if specDirectory = atom.getLoadSettings().specDirectory
+  requireSpecs(specDirectory)
+  setSpecType('user')
+else
   # runAllSpecs()
+  {resourcePath} = atom.getLoadSettings()
 
-require './pane-spec'
-require './command-registry-spec'
-require './package-spec'
-require './package-manager-spec'
-require './styles-element-spec'
-require './style-manager-spec'
-require './atom-protocol-handler-spec'
-require './theme-manager-spec'
-require './atom-spec'
-require './buffered-process-spec'
-require './buffered-node-process-spec'
-require './config-spec'
-require './context-menu-manager-spec'
-require './custom-gutter-component-spec'
-require './default-directory-provider-spec'
+  requireSpecs(path.join(resourcePath, 'spec'))
+  setSpecType('core')
+  
+# require './pane-spec'
+# require './command-registry-spec'
+# require './package-spec'
+# require './package-manager-spec'
+# require './styles-element-spec'
+# require './style-manager-spec'
+# require './atom-protocol-handler-spec'
+# require './theme-manager-spec'
+# require './atom-spec'
+# require './buffered-process-spec'
+# require './buffered-node-process-spec'
+# require './config-spec'
+# require './context-menu-manager-spec'
+# require './custom-gutter-component-spec'
+# require './default-directory-provider-spec'
+# require './display-buffer-spec'
