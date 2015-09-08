@@ -75,3 +75,4 @@ else
 # require './default-directory-provider-spec'
 # require './display-buffer-spec'
 # require './tooltip-manager-spec'
+# require './view-registry-spec'

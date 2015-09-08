@@ -1,5 +1,5 @@
 ViewRegistry = require '../src/view-registry'
-{View} = require '../src/space-pen-extensions'
+View = require 'space-view'
 
 describe "ViewRegistry", ->
   registry = null
@@ -17,14 +17,14 @@ describe "ViewRegistry", ->
         expect(registry.getView(node)).toBe node
 
     describe "when passed a SpacePen view", ->
-      it "returns the root node of the view with a .spacePenView property pointing at the SpacePen view", ->
+      it "returns the root node of the view with a .spaceView property pointing at the SpacePen view", ->
         class TestView extends View
           @content: -> @div "Hello"
 
         view = new TestView
         node = registry.getView(view)
         expect(node.textContent).toBe "Hello"
-        expect(node.spacePenView).toBe view
+        expect(node.spaceView).toBe view
 
     describe "when passed a model object", ->
       describe "when a view provider is registered matching the object's constructor", ->
@@ -65,7 +65,7 @@ describe "ViewRegistry", ->
             node = registry.getView(model)
 
             expect(node.textContent).toBe "hello"
-            view = node.spacePenView
+            view = node.spaceView
             expect(view instanceof TestView).toBe true
             expect(view.model).toBe model
 

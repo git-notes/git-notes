@@ -147,6 +147,8 @@ class ViewRegistry
   createView: (object) ->
     if object instanceof HTMLElement
       object
+    else if object?.root instanceof HTMLElement
+      object.root
     else if object?.jquery
       object[0]
     else if provider = @findProvider(object)
@@ -157,7 +159,7 @@ class ViewRegistry
       element
     else if viewConstructor = object?.getViewClass?()
       view = new viewConstructor(object)
-      view[0]
+      view.root
     else
       throw new Error("Can't create a view for #{object.constructor.name} instance. Please register a view provider.")
 
