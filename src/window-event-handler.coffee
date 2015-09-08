@@ -86,8 +86,8 @@ class WindowEventHandler
         atom.config.set('core.autoHideMenuBar', not atom.config.get('core.autoHideMenuBar'))
 
     @subscriptions.add atom.commands.add document,
-      'core:focus-next', @focusNext
-      'core:focus-previous', @focusPrevious
+      'core:focus-next': @focusNext
+      'core:focus-previous': @focusPrevious
 
     @subscribeEvent document, 'keydown', @onKeydown
 
@@ -149,12 +149,13 @@ class WindowEventHandler
     event.stopPropagation()
     event.dataTransfer.dropEffect = 'none'
 
-  openLink: ({target, currentTarget}) ->
-    console.log 'openLink'
+  openLink: (event) ->
+    {target, currentTarget} = event
     location = target?.getAttribute('href') or currentTarget?.getAttribute?('href')
     if location and location[0] isnt '#' and /^https?:\/\//.test(location)
       shell.openExternal(location)
-    false
+    event.stopPropagation()
+    event.preventDefault()
 
   eachTabIndexedElement: (callback) ->
     for element in document.querySelectorAll('[tabindex]')
