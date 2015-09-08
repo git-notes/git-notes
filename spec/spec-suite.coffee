@@ -57,7 +57,7 @@ else
 
   requireSpecs(path.join(resourcePath, 'spec'))
   setSpecType('core')
-  
+
 # require './pane-spec'
 # require './command-registry-spec'
 # require './package-spec'
@@ -74,3 +74,4 @@ else
 # require './custom-gutter-component-spec'
 # require './default-directory-provider-spec'
 # require './display-buffer-spec'
+# require './tooltip-manager-spec'

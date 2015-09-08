@@ -1,5 +1,6 @@
 TooltipManager = require '../src/tooltip-manager'
 _ = require "underscore-plus"
+$ = require 'jquery'
 
 describe "TooltipManager", ->
   [manager, element] = []
