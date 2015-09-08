@@ -48,15 +48,15 @@ runAllSpecs = ->
   requireSpecs(path.join(packagePath, 'spec')) for packagePath in packagePaths.user ? []
   setSpecType('user')
 
-# if specDirectory = atom.getLoadSettings().specDirectory
-#   requireSpecs(specDirectory)
-#   setSpecType('user')
-# else
-#   # runAllSpecs()
-#   {resourcePath} = atom.getLoadSettings()
-#
-#   requireSpecs(path.join(resourcePath, 'spec'))
-#   setSpecType('core')
+if specDirectory = atom.getLoadSettings().specDirectory
+  requireSpecs(specDirectory)
+  setSpecType('user')
+else
+  # runAllSpecs()
+  {resourcePath} = atom.getLoadSettings()
+
+  requireSpecs(path.join(resourcePath, 'spec'))
+  setSpecType('core')
 
 # require './pane-spec'
 # require './command-registry-spec'
@@ -76,4 +76,4 @@ runAllSpecs = ->
 # require './display-buffer-spec'
 # require './tooltip-manager-spec'
 # require './view-registry-spec'
-require './window-spec'
+# require './window-spec'

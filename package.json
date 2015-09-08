@@ -79,7 +79,13 @@
     "solarized-dark-syntax": "0.38.1",
     "solarized-light-syntax": "0.22.1",
     "about": "1.0.1",
-    "language-javascript": "0.89.0"
+    "language-css": "0.34.0",
+    "language-git": "0.10.0",
+    "language-javascript": "0.89.0",
+    "language-ruby": "0.57.0",
+    "language-source": "0.9.0",
+    "language-text": "0.7.0",
+    "language-xml": "0.32.0"
   },
   "private": true,
   "scripts": {
