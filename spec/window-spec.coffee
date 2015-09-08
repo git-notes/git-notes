@@ -1,9 +1,10 @@
-{$, $$} = require '../src/space-pen-extensions'
+# {$, $$} = require '../src/space-pen-extensions'
 path = require 'path'
 fs = require 'fs-plus'
 temp = require 'temp'
 TextEditor = require '../src/text-editor'
 WindowEventHandler = require '../src/window-event-handler'
+View = require 'space-view'
 
 describe "Window", ->
   [projectPath, windowEventHandler] = []
@@ -22,31 +23,30 @@ describe "Window", ->
 
   afterEach ->
     windowEventHandler.unsubscribe()
-    $(window).off 'beforeunload'
 
   describe "when the window is loaded", ->
     it "doesn't have .is-blurred on the body tag", ->
-      expect($("body")).not.toHaveClass("is-blurred")
+      expect(document.body).not.toHaveClass("is-blurred")
 
   describe "when the window is blurred", ->
     beforeEach ->
-      $(window).triggerHandler 'blur'
+      window.dispatchEvent new FocusEvent('blur')
 
     afterEach ->
-      $('body').removeClass('is-blurred')
+      document.body.classList.remove('is-blurred')
 
     it "adds the .is-blurred class on the body", ->
-      expect($("body")).toHaveClass("is-blurred")
+      expect(document.body).toHaveClass("is-blurred")
 
     describe "when the window is focused again", ->
       it "removes the .is-blurred class from the body", ->
-        $(window).triggerHandler 'focus'
-        expect($("body")).not.toHaveClass("is-blurred")
+        window.dispatchEvent new FocusEvent('focus')
+        expect(document.body).not.toHaveClass("is-blurred")
 
   describe "window:close event", ->
     it "closes the window", ->
       spyOn(atom, 'close')
-      $(window).trigger 'window:close'
+      atom.commands.dispatch window, 'window:close'
       expect(atom.close).toHaveBeenCalled()
 
   describe "beforeunload event", ->
@@ -54,7 +54,7 @@ describe "Window", ->
 
     beforeEach ->
       jasmine.unspy(TextEditor.prototype, "shouldPromptToSave")
-      beforeUnloadEvent = $.Event(new Event('beforeunload'))
+      beforeUnloadEvent = new Event('beforeunload')
 
     describe "when pane items are modified", ->
       it "prompts user to save and calls atom.workspace.confirmClose", ->
@@ -67,7 +67,7 @@ describe "Window", ->
 
         runs ->
           editor.insertText("I look different, I feel different.")
-          $(window).trigger(beforeUnloadEvent)
+          window.dispatchEvent beforeUnloadEvent
           expect(atom.workspace.confirmClose).toHaveBeenCalled()
           expect(atom.confirm).toHaveBeenCalled()
 
@@ -80,7 +80,7 @@ describe "Window", ->
 
         runs ->
           editor.insertText("I look different, I feel different.")
-          $(window).trigger(beforeUnloadEvent)
+          window.dispatchEvent beforeUnloadEvent
           expect(atom.confirm).toHaveBeenCalled()
 
       it "prompts user to save and handler returns false if dialog is canceled", ->
@@ -91,7 +91,7 @@ describe "Window", ->
 
         runs ->
           editor.insertText("I look different, I feel different.")
-          $(window).trigger(beforeUnloadEvent)
+          window.dispatchEvent beforeUnloadEvent
           expect(atom.confirm).toHaveBeenCalled()
 
       describe "when the same path is modified in multiple panes", ->
@@ -108,7 +108,7 @@ describe "Window", ->
           runs ->
             atom.workspace.getActivePane().splitRight(copyActiveItem: true)
             editor.setText('world')
-            $(window).trigger(beforeUnloadEvent)
+            window.dispatchEvent beforeUnloadEvent
             expect(atom.workspace.confirmClose).toHaveBeenCalled()
             expect(atom.confirm.callCount).toBe 1
             expect(fs.readFileSync(filePath, 'utf8')).toBe 'world'
@@ -146,22 +146,29 @@ describe "Window", ->
       shell = require 'shell'
       spyOn(shell, 'openExternal')
 
-      $("<a href='http://github.com'>the website</a>").appendTo(document.body).click().remove()
+      clickRemoveLink = (href)->
+        linkNode = View.buildDOMFromHTML("<a href='#{href}'>the website</a>")
+        document.body.appendChild linkNode
+        linkNode.dispatchEvent new MouseEvent('click', {bubbles: true})
+        linkNode.remove()
+
+      clickRemoveLink('http://github.com')
       expect(shell.openExternal).toHaveBeenCalled()
       expect(shell.openExternal.argsForCall[0][0]).toBe "http://github.com"
 
       shell.openExternal.reset()
-      $("<a href='https://github.com'>the website</a>").appendTo(document.body).click().remove()
+      clickRemoveLink('https://github.com')
       expect(shell.openExternal).toHaveBeenCalled()
       expect(shell.openExternal.argsForCall[0][0]).toBe "https://github.com"
 
       shell.openExternal.reset()
-      $("<a href=''>the website</a>").appendTo(document.body).click().remove()
+      clickRemoveLink('')
       expect(shell.openExternal).not.toHaveBeenCalled()
 
       shell.openExternal.reset()
-      $("<a href='#scroll-me'>link</a>").appendTo(document.body).click().remove()
+      clickRemoveLink('#scroll-me')
       expect(shell.openExternal).not.toHaveBeenCalled()
+      console.log 'end'
 
   describe "when a form is submitted", ->
     it "prevents the default so that the window's URL isn't changed", ->

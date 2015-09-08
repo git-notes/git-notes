@@ -1,5 +1,6 @@
 require '../src/window'
 atom.initialize()
+atom.windowEventHandler.unsubscribe()
 atom.restoreWindowDimensions()
 
 require 'jasmine-json'

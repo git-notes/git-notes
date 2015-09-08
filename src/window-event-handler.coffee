@@ -96,7 +96,7 @@ class WindowEventHandler
     @subscribeEvent document, 'dragover', @onDragOver
 
     @subscribeEvent document, 'click', (event) =>
-       @openLink() if event.target.matches('a')
+      @openLink(event) if event.target.matches('a')
 
     # Prevent form submits from changing the current window's URL
     @subscribeEvent document, 'submit', (event) ->
@@ -150,7 +150,8 @@ class WindowEventHandler
     event.dataTransfer.dropEffect = 'none'
 
   openLink: ({target, currentTarget}) ->
-    location = target?.getAttribute('href') or currentTarget?.getAttribute('href')
+    console.log 'openLink'
+    location = target?.getAttribute('href') or currentTarget?.getAttribute?('href')
     if location and location[0] isnt '#' and /^https?:\/\//.test(location)
       shell.openExternal(location)
     false
