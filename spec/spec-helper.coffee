@@ -132,7 +132,7 @@ beforeEach ->
   spyOn(Config::, 'save')
   config = new Config({resourcePath, configDirPath: atom.getConfigDirPath()})
   atom.config = config
-  # atom.loadConfig()
+  atom.loadConfig()
   config.set "core.destroyEmptyPanes", false
   config.set "editor.fontFamily", "Courier"
   config.set "editor.fontSize", 16

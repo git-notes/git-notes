@@ -280,6 +280,7 @@ class LanguageMode
   minIndentLevelForRowRange: (startRow, endRow) ->
     indents = (@editor.indentationForBufferRow(row) for row in [startRow..endRow] by 1 when not @editor.isBufferRowBlank(row))
     indents = [0] unless indents.length
+    console.log JSON.stringify(indents, null, 2)
     Math.min(indents...)
 
   # Indents all the rows between two buffer row numbers.

@@ -29,7 +29,7 @@ describe "ThemeManager", ->
       themes = themeManager.getLoadedThemes()
       expect(themes.length).toBeGreaterThan(2)
 
-    it 'getActiveThemes get all the active themes', ->
+    fit 'getActiveThemes get all the active themes', ->
       waitsForPromise ->
         themeManager.activateThemes()
 
