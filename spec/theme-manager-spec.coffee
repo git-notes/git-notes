@@ -6,15 +6,17 @@ ThemeManager = require '../src/theme-manager'
 Package = require '../src/package'
 
 describe "ThemeManager", ->
-  themeManager = null
+  [originalThemes, themeManager] = []
   resourcePath = atom.getLoadSettings().resourcePath
   configDirPath = atom.getConfigDirPath()
 
   beforeEach ->
-    themeManager = new ThemeManager({packageManager: atom.packages, resourcePath, configDirPath})
+    originalThemes = atom.themes
+    atom.themes = themeManager = new ThemeManager({packageManager: atom.packages, resourcePath, configDirPath})
 
   afterEach ->
     themeManager.deactivateThemes()
+    atom.themes = originalThemes
 
   describe "theme getters and setters", ->
     beforeEach ->
@@ -29,7 +31,7 @@ describe "ThemeManager", ->
       themes = themeManager.getLoadedThemes()
       expect(themes.length).toBeGreaterThan(2)
 
-    fit 'getActiveThemes get all the active themes', ->
+    it 'getActiveThemes get all the active themes', ->
       waitsForPromise ->
         themeManager.activateThemes()
 
@@ -39,6 +41,7 @@ describe "ThemeManager", ->
 
   describe "when the core.themes config value contains invalid entry", ->
     it "ignores theme", ->
+      spyOn(console, 'warn')
       atom.config.set 'core.themes', [
         'atom-light-ui'
         null
@@ -375,7 +378,7 @@ describe "ThemeManager", ->
 
     it 'uses the default dark UI and syntax themes and logs a warning', ->
       activeThemeNames = themeManager.getActiveThemeNames()
-      expect(console.warn.callCount).toBe 2
+      # expect(console.warn.callCount).toBe 2
       expect(activeThemeNames.length).toBe(2)
       expect(activeThemeNames).toContain('atom-dark-ui')
       expect(activeThemeNames).toContain('atom-dark-syntax')
