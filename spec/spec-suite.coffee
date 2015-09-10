@@ -58,4 +58,4 @@ runAllSpecs = ->
 #   requireSpecs(path.join(resourcePath, 'spec'))
 #   setSpecType('core')
 
-require './theme-manager-spec'
+require './menu-manager-spec'
