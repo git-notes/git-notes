@@ -58,4 +58,4 @@ runAllSpecs = ->
 #   requireSpecs(path.join(resourcePath, 'spec'))
 #   setSpecType('core')
 
-require './menu-manager-spec'
+require './text-editor-element-spec'

@@ -29,6 +29,7 @@ class Pane extends Model
     @addItems(compact(params?.items ? []))
     @setActiveItem(@items[0]) unless @getActiveItem()?
     @setFlexScale(params?.flexScale ? 1)
+    @focused = true if params?.focused
 
   # Called by the Serializable mixin during serialization.
   serializeParams: ->

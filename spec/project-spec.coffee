@@ -177,9 +177,10 @@ describe "Project", ->
 
       runs ->
         expect(atom.project.getBuffers().length).toBe 1
-        fs.chmodSync(pathToOpen, '000')
-        deserializedProject = atom.project.testSerialization()
-        expect(deserializedProject.getBuffers().length).toBe 0
+        if process.platform isnt 'win32'
+          fs.chmodSync(pathToOpen, '000')
+          deserializedProject = atom.project.testSerialization()
+          expect(deserializedProject.getBuffers().length).toBe 0
 
   describe "when an editor is saved and the project has no path", ->
     it "sets the project's path to the saved file's parent directory", ->
@@ -216,7 +217,7 @@ describe "Project", ->
       expect(notification.getType()).toBe 'warning'
       expect(notification.getDetail()).toBe 'SomeError'
       expect(notification.getMessage()).toContain '`resurrect`'
-      expect(notification.getMessage()).toContain 'fixtures/dir/a'
+      expect(notification.getMessage()).toContain path.join('fixtures', 'dir', 'a')
 
   describe ".open(path)", ->
     [absolutePath, newBufferHandler] = []
@@ -492,7 +493,8 @@ describe "Project", ->
     describe "when the given path is a URL", ->
       it "returns null for the root path, and the given path unchanged", ->
         url = "http://the-path"
-        expect(atom.project.relativizePath(url)).toEqual [null, url]
+        if process.platform isnt 'win32'
+          expect(atom.project.relativizePath(url)).toEqual [null, url]
 
   describe ".contains(path)", ->
     it "returns whether or not the given path is in one of the root directories", ->

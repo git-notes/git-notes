@@ -430,7 +430,7 @@ class Project extends Model
     if subscriber
       subscriber.subscribe this, 'buffer-created', (buffer) -> callback(buffer)
     else
-      @on 'buffer-created', (buffer) -> callback(buffer)
+      @onDidAddBuffer (buffer) -> callback(buffer)
 
   subscribeToBuffer: (buffer) ->
     buffer.onDidDestroy => @removeBuffer(buffer)
