@@ -246,7 +246,7 @@ module.exports = (grunt) ->
   grunt.registerTask('lint', ['coffeelint', 'csslint', 'lesslint'])
   grunt.registerTask('test', ['shell:kill-app', 'run-specs'])
 
-  ciTasks = ['output-disk-space', 'download-electron', 'copy-rebrand-electron', 'build']
+  ciTasks = ['output-disk-space', 'download-electron', 'download-electron-chromedriver', 'copy-rebrand-electron', 'build']
   ciTasks.push('dump-symbols') if process.platform isnt 'win32'
   ciTasks.push('set-version', 'check-licenses', 'lint', 'generate-asar')
   ciTasks.push('mkdeb') if process.platform is 'linux'
@@ -256,6 +256,6 @@ module.exports = (grunt) ->
   ciTasks.push('publish-build') unless process.env.TRAVIS
   grunt.registerTask('ci', ciTasks)
 
-  defaultTasks = ['download-electron', 'copy-rebrand-electron', 'build', 'set-version', 'generate-asar']
+  defaultTasks = ['download-electron', 'download-electron-chromedriver', 'copy-rebrand-electron', 'build', 'set-version', 'generate-asar']
   defaultTasks.push 'install' unless process.platform is 'linux'
   grunt.registerTask('default', defaultTasks)

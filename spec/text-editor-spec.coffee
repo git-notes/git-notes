@@ -4,7 +4,7 @@ temp = require 'temp'
 clipboard = require '../src/safe-clipboard'
 TextEditor = require '../src/text-editor'
 
-describe "TextEditor", ->
+xdescribe "TextEditor", ->
   [buffer, editor, lineLengths] = []
 
   convertToHardTabs = (buffer) ->

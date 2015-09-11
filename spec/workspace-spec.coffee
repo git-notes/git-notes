@@ -287,7 +287,7 @@ describe "Workspace", ->
       runs ->
         expect(newEditorHandler.argsForCall[0][0].textEditor).toBe editor
 
-    it "records a deprecation warning on the appropriate package if the item has a ::getUri method instead of ::getURI", ->
+    xit "records a deprecation warning on the appropriate package if the item has a ::getUri method instead of ::getURI", ->
       jasmine.snapshotDeprecations()
 
       waitsForPromise -> atom.packages.activatePackage('package-with-deprecated-pane-item-method')
@@ -477,7 +477,7 @@ describe "Workspace", ->
       expect(atom.config.get('editor.fontSize')).toBe originalFontSize
 
   describe "::openLicense()", ->
-    it "opens the license as plain-text in a buffer", ->
+    xit "opens the license as plain-text in a buffer", ->
       waitsForPromise -> workspace.openLicense()
       runs -> expect(workspace.getActivePaneItem().getText()).toMatch /Copyright/
 
