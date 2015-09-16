@@ -110,7 +110,7 @@ module.exports = (grunt) ->
         args: ['/c', appPath, '--test', "--resource-path=#{resourcePath}", "--spec-directory=#{coreSpecsPath}", '--log-file=ci.log']
         opts:
           env: _.extend({}, process.env,
-            ATOM_INTEGRATION_TESTS_ENABLED: true
+            # ATOM_INTEGRATION_TESTS_ENABLED: true # TODO: enable the integration test in windows
           )
 
     grunt.log.ok "Launching core specs."
