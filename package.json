@@ -1,22 +1,22 @@
 {
-  "name": "xmail",
-  "productName": "Xmail",
+  "name": "git-notes",
+  "productName": "GitNotes",
   "version": "0.0.1",
-  "description": "A Mail Client App",
+  "description": "A Notes Client Using Git",
   "main": "./src/browser/main.js",
   "author": "liuxiong",
   "repository": {
     "type": "git",
-    "url": "https://github.com/liuxiong332/xmail"
+    "url": "https://github.com/git-notes/git-notes"
   },
   "bugs": {
-    "url": "https://github.com/liuxiong332/xmail/issues"
+    "url": "https://github.com/liuxiong332/git-notes/issues"
   },
   "license": "MIT",
   "atomShellVersion": "0.30.0",
   "dependencies": {
     "async": "0.2.6",
-    "atom-keymap": "^5.1.8",
+    "atom-keymap": "^5.2.0",
     "atom-space-pen-views": "^2.0.4",
     "babel-core": "^5.8.3",
     "bootstrap": "^3.3.4",
