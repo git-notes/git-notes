@@ -24,11 +24,6 @@ function executeCommands(commands, done, index) {
     done(null);
 }
 
-
-function getHomeDirectory() {
-  return process.platform === 'win32' ? process.env.USERPROFILE : process.env.HOME
-}
-
 var name = require('../package.json').name;
 
 function bootstrap() {
